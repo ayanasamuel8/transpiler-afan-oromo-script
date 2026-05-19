@@ -24,7 +24,8 @@ class OrmConsole(code.InteractiveConsole):
 
     def runsource(self, source: str, filename: str = "<input>", symbol: str = "single") -> bool:
         try:
-            py_src = transpile(source, lang=self._lang)
+            result = transpile(source, lang=self._lang)
+            py_src = result[0] if isinstance(result, tuple) else result
         except OrmError as e:
             print(str(e), file=sys.stderr)
             return False
@@ -67,7 +68,10 @@ def compile(file: Path, lang: str, emit_map: bool, output: Path | None, stdout: 
         click.echo(str(e), err=True)
         sys.exit(1)
 
-    py_src, map_json = (result if emit_map else (result, None))  # type: ignore
+    if isinstance(result, tuple):
+        py_src, map_json = result
+    else:
+        py_src, map_json = result, None
 
     if stdout:
         click.echo(py_src)
