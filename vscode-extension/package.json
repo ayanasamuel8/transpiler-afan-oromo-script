@@ -1,0 +1,21 @@
+{
+  "name": "oromscript",
+  "displayName": "OromScript",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "contributes": {
+    "languages": [{
+      "id": "afan-oromo",
+      "aliases": ["Afan Oromo", "OrmScript"],
+      "extensions": [".orm"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "afan-oromo",
+      "scopeName": "source.afan-oromo",
+      "path": "./syntaxes/afan_oromo.tmLanguage.json"
+    }]
+  }
+}

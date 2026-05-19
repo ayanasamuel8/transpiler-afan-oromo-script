@@ -1,0 +1,10 @@
+gosa Barataa:
+    hojii __init__(of, maqaa, umri):
+        of.maqaa = maqaa
+        of.umri = umri
+
+    hojii of_ibsi(of):
+        agarsiisi(f'{of.maqaa}: {of.umri}')
+
+b = Barataa('Chaltu', 20)
+b.of_ibsi()

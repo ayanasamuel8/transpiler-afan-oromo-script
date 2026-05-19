@@ -1,0 +1,12 @@
+{
+  "E0001": "Dogoggora: Qubee '{token}' sirrii miti — sarara {line}, tuqaa {col}",
+  "E0010": "Dogoggora caasaa — sarara {line}, tuqaa {col}: {text}",
+  "E0011": "Dogoggora wawwaltoo (indentation) — sarara {line}",
+  "E0012": "Jechoota Afaan Oromoo fi Python walitti hin makatin — sarara {line}: '{local}' fi '{py}'",
+  "E0020": "Maqaan '{name}' hin beekamu — sarara {line}, tuqaa {col}",
+  "E0030": "Dogoggora hook caasaa — '{hook}': {error}",
+  "E0050": "keyword_map.json afaan '{lang}' keessa '{dir}' hin argamne",
+  "E0051": "Afaan '{lang}' hin deeggeramu. Afaanota deeggeraman: {available}",
+  "E0052": "keyword_map.json afaan '{lang}' sirrii miti — '{field}': {error}",
+  "E0060": "Jechamni '{token}' iddoo dha'uuf qabamu hin dha'u — sarara {line}"
+}

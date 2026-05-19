@@ -1,0 +1,10 @@
+# Default: all maintainers review everything
+*                           @ayanasamuel8
+
+# Language adapters: adapter authors are owners of their adapter
+adapters/afan_oromo/        @ayanasamuel8
+adapters/amharic/           @amharic-adapter-maintainer
+
+# Core engine: requires senior maintainer review
+oromscript/                 @ayanasamuel8
+schemas/                    @ayanasamuel8

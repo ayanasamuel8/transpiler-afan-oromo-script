@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Afan Oromo",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "source.python"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.afan-oromo",
+          "match": "\\b(Sobaa|Wanti_hin_jirre|Dhugaa|fi|akka|mirkaanessi|yeroo_eeguu|eegi|addaan_kut|gosa|itti_fufuu|hojii|haqi|yookaan|yoo_miti|dogoggora|dhuma|hanga|irra|addunyaa|yoo|fidi|keessa|dha|hojii_gabaabaa|naannoo_miti|miti|yookaan_immoo|darbii|ol_kaasi|deebi|yaali|yeroo|waliin|kennii|kennii_irra)\\b"
+        },
+        {
+          "name": "support.function.builtin.afan-oromo",
+          "match": "\\b(agarsiisi|gaafadhu|dheerina|lakkoofsa|tarree|galmee|walitti_qabama|tarree_cufamaa|barruu|lakki|lakki_caccabaa|dhugaa_sobaa|gosa_data|bani|walitti_makami|jijjiiri|caalbaasi|tartiibessi|walitti_ida'i|xiqqaa|guddaa|gatii_dhugaa|marsii|lakkaa_fi_argadhu|of|abbaa_gosa)\\b"
+        }
+      ]
+    }
+  },
+  "scopeName": "source.afan-oromo"
+}

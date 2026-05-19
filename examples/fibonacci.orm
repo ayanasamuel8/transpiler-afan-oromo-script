@@ -1,0 +1,8 @@
+hojii faarfannaa(lakki):
+    yoo lakki % 2 == 0:
+        deebi 'lakkoofsa lakkaa'
+    yoo_miti:
+        deebi 'lakkoofsa baayyee'
+
+hanga i keessa lakkoofsa(1, 11):
+    agarsiisi(faarfannaa(i))
