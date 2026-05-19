@@ -11,6 +11,7 @@ Public API::
 from __future__ import annotations
 
 from pathlib import Path
+import typing
 
 from .adapter import AdapterRegistry
 from .codegen import CodeGen
@@ -57,7 +58,7 @@ def transpile(
 def execute(
     source: str,
     lang: str = "afan_oromo",
-    globals: dict | None = None,
+    globals: dict[str, typing.Any] | None = None,
 ) -> None:
     """Transpile and execute localised source.
 
@@ -66,5 +67,6 @@ def execute(
         lang:    Language adapter to use.
         globals: Optional globals dict for exec().
     """
-    py_source = transpile(source, lang=lang)
+    result = transpile(source, lang=lang)
+    py_source = result[0] if isinstance(result, tuple) else result
     exec(compile(py_source, "<orm>", "exec"), globals or {})  # noqa: S102
