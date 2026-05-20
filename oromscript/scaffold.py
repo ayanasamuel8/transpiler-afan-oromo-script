@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+
 def scaffold_adapter(lang_name: str, adapters_dir: Path) -> None:
     """Scaffold a new adapter directory."""
     d = adapters_dir / lang_name
@@ -10,8 +11,23 @@ def scaffold_adapter(lang_name: str, adapters_dir: Path) -> None:
         "$schema": "https://oromscript.dev/schemas/keyword_map/v1.json",
         "$lang": lang_name,
         "$version": "1.0.0",
-        "keywords": {k: "" for k in ["False", "None", "True", "and", "as", "assert", "async", "await", "break", "class", "continue", "def", "del", "elif", "else", "except", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield", "yield from"]},
-        "builtins": {k: "" for k in ["print", "input", "len", "range", "list", "dict", "set", "tuple", "str", "int", "float", "bool", "type", "open", "zip", "map", "filter", "sorted", "sum", "min", "max", "abs", "round", "enumerate", "self", "super"]}
+        "keywords": {
+            k: "" for k in [
+                "False", "None", "True", "and", "as", "assert", "async", "await",
+                "break", "class", "continue", "def", "del", "elif", "else",
+                "except", "finally", "for", "from", "global", "if", "import",
+                "in", "is", "lambda", "nonlocal", "not", "or", "pass", "raise",
+                "return", "try", "while", "with", "yield", "yield from"
+            ]
+        },
+        "builtins": {
+            k: "" for k in [
+                "print", "input", "len", "range", "list", "dict", "set", "tuple",
+                "str", "int", "float", "bool", "type", "open", "zip", "map",
+                "filter", "sorted", "sum", "min", "max", "abs", "round",
+                "enumerate", "self", "super"
+            ]
+        }
     }, indent=2) + "\n", encoding="utf-8")
     
     (d / "error_messages.json").write_text(json.dumps({
@@ -26,7 +42,9 @@ def scaffold_adapter(lang_name: str, adapters_dir: Path) -> None:
     (d / "tests").mkdir(exist_ok=True)
     (d / "tests" / "corpus").mkdir(exist_ok=True)
     (d / "tests" / "__init__.py").write_text("", encoding="utf-8")
-    (d / "tests" / "test_keywords.py").write_text("# Tests for keywords\n", encoding="utf-8")
+    (d / "tests" / "test_keywords.py").write_text(
+        "# Tests for keywords\n", encoding="utf-8"
+    )
     
     print(f"✓ Adapter scaffolded at {d}")
     print("Next steps:")

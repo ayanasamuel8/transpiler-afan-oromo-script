@@ -1,11 +1,9 @@
-import ast
-from oromscript.codegen import CodeGen
 from oromscript import transpile
 
 
 def test_hello_world_roundtrip():
     result = transpile('agarsiisi("Akkam, Addunyaa!")', lang="afan_oromo")
-    assert result == 'print("Akkam, Addunyaa!")'
+    assert result == "print('Akkam, Addunyaa!')"
 
 
 def test_for_loop_roundtrip():

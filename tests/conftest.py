@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from oromscript.adapter import Adapter, AdapterRegistry
 
 ADAPTERS_DIR = Path(__file__).parent.parent / "adapters"

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from oromscript import transpile
 
 ADAPTERS_DIR = Path(__file__).parent.parent / "adapters"
@@ -18,7 +20,9 @@ def collect_corpus_cases():
         for orm_file in sorted(corpus_dir.glob("*.orm")):
             py_file = orm_file.with_suffix(".py")
             if py_file.exists():
-                cases.append(pytest.param(lang, orm_file, py_file, id=f"{lang}/{orm_file.stem}"))
+                cases.append(
+                    pytest.param(lang, orm_file, py_file, id=f"{lang}/{orm_file.stem}")
+                )
     return cases
 
 

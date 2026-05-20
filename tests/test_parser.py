@@ -1,8 +1,10 @@
 import ast
+
 import pytest
-from oromscript.parser import OrmParser
-from oromscript.lexer import OrmLexer
+
 from oromscript.errors import OrmSyntaxError
+from oromscript.lexer import OrmLexer
+from oromscript.parser import OrmParser
 
 
 def test_parses_hello_world(oromo_adapter):

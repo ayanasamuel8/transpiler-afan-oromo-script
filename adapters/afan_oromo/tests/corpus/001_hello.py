@@ -1,2 +1,1 @@
-# Baga nagaan dhufte!
-print("Akkam, Addunyaa!")
+print('Akkam, Addunyaa!')

@@ -10,8 +10,8 @@ Public API::
 """
 from __future__ import annotations
 
-from pathlib import Path
 import typing
+from pathlib import Path
 
 from .adapter import AdapterRegistry
 from .codegen import CodeGen

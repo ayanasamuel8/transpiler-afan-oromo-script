@@ -5,14 +5,13 @@ Click-based command-line interface for OromScript.
 """
 from __future__ import annotations
 
+import code
 import sys
 from pathlib import Path
-import code
 
 import click
 
 from . import execute, transpile
-from .adapter import AdapterRegistry
 from .errors import OrmError
 
 ADAPTERS_DIR = Path(__file__).parent.parent / "adapters"
@@ -22,7 +21,9 @@ class OrmConsole(code.InteractiveConsole):
         super().__init__()
         self._lang = lang
 
-    def runsource(self, source: str, filename: str = "<input>", symbol: str = "single") -> bool:
+    def runsource(
+        self, source: str, filename: str = "<input>", symbol: str = "single"
+    ) -> bool:
         try:
             result = transpile(source, lang=self._lang)
             py_src = result[0] if isinstance(result, tuple) else result
@@ -59,7 +60,9 @@ def run(file: Path, lang: str, strict: bool, no_cache: bool) -> None:
 @click.option("--map", "emit_map", is_flag=True)
 @click.option("-o", "--output", type=click.Path(path_type=Path))
 @click.option("--stdout", is_flag=True)
-def compile(file: Path, lang: str, emit_map: bool, output: Path | None, stdout: bool) -> None:
+def compile(
+    file: Path, lang: str, emit_map: bool, output: Path | None, stdout: bool
+) -> None:
     """Transpile FILE to Python source."""
     source = file.read_text(encoding="utf-8")
     try:
@@ -104,10 +107,9 @@ def check(file: Path, lang: str, strict: bool) -> None:
 @click.option("--lang", default="afan_oromo", show_default=True)
 def repl(lang: str) -> None:
     """Start an interactive OromScript REPL."""
-    try:
+    import contextlib
+    with contextlib.suppress(ImportError):
         import readline  # noqa: F401
-    except ImportError:
-        pass
     OrmConsole(lang=lang).interact(banner=f"OromScript REPL ({lang}) — Ctrl+D to exit")
 
 
@@ -126,3 +128,6 @@ def validate_adapter(paths: tuple[Path, ...]) -> None:
     from .validate import validate_adapters
     ok = validate_adapters(list(paths))
     sys.exit(0 if ok else 1)
+
+if __name__ == "__main__":
+    main()

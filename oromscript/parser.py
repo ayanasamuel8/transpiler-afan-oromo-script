@@ -24,7 +24,7 @@ class OrmParser:
         adapter: The loaded Adapter for the active language.
     """
 
-    def __init__(self, adapter: "Adapter") -> None:
+    def __init__(self, adapter: Adapter) -> None:
         self._adapter = adapter
 
     def parse(self, tokens: list[tokenize.TokenInfo]) -> ast.AST:

@@ -1,5 +1,5 @@
-def faarfannaa(lakki):
-    if lakki % 2 == 0:
+def faarfannaa(int):
+    if int % 2 == 0:
         return 'lakkoofsa lakkaa'
     else:
         return 'lakkoofsa baayyee'

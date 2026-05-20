@@ -68,8 +68,12 @@ class SemanticAnalyser(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Name(self, node: ast.Name) -> None:
-        if self._strict and isinstance(node.ctx, ast.Load):
-            if node.id not in self._scope and node.id not in dir(__builtins__):
+        if (
+            self._strict
+            and isinstance(node.ctx, ast.Load)
+            and node.id not in self._scope
+            and node.id not in dir(__builtins__)
+        ):
                 from .errors import OrmNameError
                 raise OrmNameError(
                     code="E0020",

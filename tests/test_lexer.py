@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import tokenize
+
 import pytest
-from oromscript.lexer import OrmLexer
-from oromscript.adapter import AdapterRegistry
+
 from oromscript.errors import OrmLexError
+from oromscript.lexer import OrmLexer
 
 
 def test_translates_keyword(oromo_adapter):
@@ -46,3 +48,9 @@ def test_token_immutability(oromo_adapter):
     tokens_before = list(lexer._source)
     lexer.tokenize()
     assert list(lexer._source) == tokens_before
+
+def test_lexer_token_error():
+    from oromscript import transpile
+    with pytest.raises(OrmLexError) as exc:
+        transpile('agarsiisi("', lang='afan_oromo')
+    assert exc.value.code == "E0001"

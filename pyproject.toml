@@ -57,6 +57,7 @@ Issues = "https://github.com/ayanasamuel8/transpiler-afan-oromo-script/issues"
 [tool.ruff]
 line-length = 88
 target-version = "py310"
+[tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "S"]
 ignore = ["S101"]   # allow assert in tests
 

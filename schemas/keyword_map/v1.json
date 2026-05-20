@@ -1,0 +1,8 @@
+{
+    "type": "object",
+    "required": ["$lang", "$version", "keywords", "builtins"],
+    "properties": {
+        "keywords": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+        "builtins": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}}
+    }
+}

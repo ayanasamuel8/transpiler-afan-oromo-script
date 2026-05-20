@@ -8,6 +8,7 @@ error messages, optional grammar hooks) for one local language.
 """
 from __future__ import annotations
 
+import contextlib
 import importlib
 import json
 from dataclasses import dataclass, field
@@ -26,7 +27,7 @@ class Adapter:
     grammar_hooks: ModuleType | None = field(default=None, repr=False)
 
     @classmethod
-    def load(cls, adapter_dir: Path) -> "Adapter":
+    def load(cls, adapter_dir: Path) -> Adapter:
         """Load an adapter from a directory.
 
         Args:
@@ -53,12 +54,10 @@ class Adapter:
 
         # Load optional grammar hooks module
         hooks: ModuleType | None = None
-        try:
+        with contextlib.suppress(ModuleNotFoundError):
             hooks = importlib.import_module(
                 f"adapters.{adapter_dir.name}.grammar_hooks"
             )
-        except ModuleNotFoundError:
-            pass
 
         return cls(
             lang=lang,
@@ -78,9 +77,12 @@ class AdapterRegistry:
     def discover(cls, adapters_dir: Path) -> None:
         """Scan adapters_dir and register all found adapters."""
         for d in adapters_dir.iterdir():
-            if d.is_dir() and (d / "keyword_map.json").exists():
-                if d.name not in cls._adapters:
-                    cls._adapters[d.name] = Adapter.load(d)
+            if (
+                d.is_dir()
+                and (d / "keyword_map.json").exists()
+                and d.name not in cls._adapters
+            ):
+                cls._adapters[d.name] = Adapter.load(d)
 
     @classmethod
     def get(cls, lang: str) -> Adapter:

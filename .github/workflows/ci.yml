@@ -54,7 +54,7 @@ jobs:
       - name: Run tests with coverage
         run: >
           pytest tests/ adapters/*/tests/ -v --tb=short
-          --cov=oromscript --cov-report=xml --cov-fail-under=90
+          --cov=oromscript --cov-report=xml --cov-fail-under=95
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

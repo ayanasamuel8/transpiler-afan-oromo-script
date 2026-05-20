@@ -31,7 +31,7 @@ class OrmLexer:
         tokens = lexer.tokenize()
     """
 
-    def __init__(self, source: str, adapter: "Adapter") -> None:
+    def __init__(self, source: str, adapter: Adapter) -> None:
         self._source = source
         self._adapter = adapter
         forward_map = {
