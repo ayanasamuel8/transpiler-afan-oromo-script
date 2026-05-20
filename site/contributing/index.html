@@ -67,6 +67,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#contributing-to-oromscript" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -554,6 +559,26 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -571,6 +596,58 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#contribution-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contribution Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-language-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Language Adapter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing &amp; Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -623,9 +700,37 @@
   
 
 
-  <h1>Contributing</h1>
-
-
+<h1 id="contributing-to-oromscript">Contributing to OromScript</h1>
+<p>We welcome contributions of all forms—bug reports, feature requests, new language adapters, and code contributions. </p>
+<h2 id="contribution-workflow">Contribution Workflow</h2>
+<ol>
+<li><strong>Fork &amp; Clone</strong> the repository.</li>
+<li><strong>Branching</strong>:</li>
+<li><code>feat/</code> for new features or keywords</li>
+<li><code>fix/</code> for bug fixes</li>
+<li><code>lang/</code> for new language adapters</li>
+<li><code>docs/</code> for documentation</li>
+<li><code>chore/</code> for tooling and deps</li>
+<li><strong>Make changes</strong> and ensure <code>make test</code> runs cleanly.</li>
+<li><strong>Open a Pull Request</strong> to the <code>main</code> branch.</li>
+</ol>
+<h2 id="adding-a-new-language-adapter">Adding a New Language Adapter</h2>
+<p>Using OromScript's plugin infrastructure, it's easy to add a new language. You primarily need to supply a JSON keyword map and an error messages set.</p>
+<ol>
+<li><strong>Scaffold</strong>: <code>oromscript new-lang amharic</code> (for Amharic)</li>
+<li><strong>Translate Keywords</strong>: Edit <code>adapters/&lt;lang&gt;/keyword_map.json</code> mapping each Python keyword/builtin to local equivalents.</li>
+<li><strong>Localize Errors</strong>: Fill <code>error_messages.json</code> with appropriate translated syntax errors.</li>
+<li><strong>Test Corpus</strong>: Add testing <code>.orm</code> and expected <code>.py</code> pairs in <code>adapters/&lt;lang&gt;/tests/corpus/</code></li>
+<li><strong>Validate Schema</strong>: Run <code>oromscript validate-adapter adapters/&lt;lang&gt;/</code></li>
+<li><strong>Submit PR</strong>.</li>
+</ol>
+<h2 id="testing-coverage">Testing &amp; Coverage</h2>
+<ul>
+<li>We require <strong>100%</strong> of keywords in <code>keyword_map.json</code> to have at least one corpus test.</li>
+<li>Every mapped error path should trigger properly in tests.</li>
+<li>Core engine coverage requirement is ≥ 90%.</li>
+</ul>
+<p>For more details on the architecture, see <a href="../architecture/">Architecture</a> and <a href="../OromScript_Design_Specification/">Design Specification</a>.</p>
 
 
 

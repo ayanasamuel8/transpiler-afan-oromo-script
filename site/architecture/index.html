@@ -67,6 +67,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -446,6 +451,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -623,9 +630,15 @@
   
 
 
-  <h1>Architecture</h1>
-
-
+<h1 id="architecture">Architecture</h1>
+<p>The OromScript transpiler pipeline is designed to be fully standard-compliant with modern Python, meaning its output is standard Python code. The pipeline consists of the following core stages:</p>
+<ol>
+<li><strong>Lexer</strong> (<code>oromscript.lexer</code>): Tokenizes the local language source code and maps keywords (e.g., <code>hojii</code> -&gt; <code>def</code>).</li>
+<li><strong>Parser</strong> (<code>oromscript.parser</code>): Transforms the token stream into a Python Abstract Syntax Tree (AST).</li>
+<li><strong>Semantic Analysis</strong> (<code>oromscript.semantic</code>): Validates the AST and prepares source-map information.</li>
+<li><strong>Code Generation</strong> (<code>oromscript.codegen</code>): Traverses the AST to reconstruct perfectly formatted Python source code using <code>ast.unparse</code>.</li>
+</ol>
+<p>For a full breakdown of the system design, read the <a href="../OromScript_Design_Specification/">OromScript Design Specification</a>.</p>
 
 
 
