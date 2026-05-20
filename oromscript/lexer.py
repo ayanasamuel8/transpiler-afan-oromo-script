@@ -65,6 +65,14 @@ class OrmLexer:
 
     def _translate(self, tok: py_tokenize.TokenInfo) -> py_tokenize.TokenInfo:
         """Translate a single token if it is a known local-language name."""
+        if tok.type == py_tokenize.ERRORTOKEN:
+            raise OrmLexError(
+                code="E0001",
+                message=f"Lexer error: {tok.string!r}",
+                orm_line=tok.start[0],
+                orm_col=tok.start[1],
+                lang=self._adapter.lang,
+            )
         if tok.type == py_tokenize.NAME:
             py_equiv = self._combined_map.get(tok.string)
             if py_equiv:

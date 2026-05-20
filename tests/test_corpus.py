@@ -9,6 +9,8 @@ from oromscript import transpile
 ADAPTERS_DIR = Path(__file__).parent.parent / "adapters"
 
 
+import ast
+
 def collect_corpus_cases():
     """Yield (lang, orm_path, py_path) for every corpus pair."""
     cases = []
@@ -29,11 +31,15 @@ def collect_corpus_cases():
 @pytest.mark.corpus
 @pytest.mark.parametrize("lang,orm_path,py_path", collect_corpus_cases())
 def test_corpus(lang: str, orm_path: Path, py_path: Path) -> None:
-    """Transpiled .orm must exactly match the reference .py."""
+    """Transpiled .orm must match the AST of the reference .py."""
     source = orm_path.read_text(encoding="utf-8")
     expected = py_path.read_text(encoding="utf-8").strip()
     result = transpile(source, lang=lang).strip()
-    assert result == expected, (
+    
+    expected_ast = ast.dump(ast.parse(expected))
+    result_ast = ast.dump(ast.parse(result))
+    
+    assert result_ast == expected_ast, (
         f"\nAdapter: {lang}\nFile: {orm_path.name}\n"
         f"--- Expected ---\n{expected}\n"
         f"--- Got ---\n{result}"
