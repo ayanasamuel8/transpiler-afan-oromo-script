@@ -1,4 +1,3 @@
-
 import pytest
 
 from oromscript.adapter import Adapter, AdapterRegistry
@@ -9,6 +8,7 @@ def test_adapter_load_missing_kmap(tmp_path):
     with pytest.raises(OrmAdapterError) as exc:
         Adapter.load(tmp_path)
     assert exc.value.code == "E0050"
+
 
 def test_adapter_registry_get_missing():
     with pytest.raises(OrmAdapterError) as exc:

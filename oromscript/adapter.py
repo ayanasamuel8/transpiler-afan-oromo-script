@@ -6,6 +6,7 @@ Adapter data class and registry.
 An Adapter encapsulates all language-specific data (keyword maps,
 error messages, optional grammar hooks) for one local language.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -90,7 +91,7 @@ class AdapterRegistry:
             raise OrmAdapterError(
                 code="E0051",
                 message=f"No adapter found for language '{lang}'. "
-                        f"Available: {list(cls._adapters)}",
+                f"Available: {list(cls._adapters)}",
                 lang=lang,
             )
         return cls._adapters[lang]

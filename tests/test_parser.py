@@ -18,7 +18,7 @@ def test_parses_hello_world(oromo_adapter):
 
 
 def test_syntax_error_raises_orm_error(oromo_adapter):
-    source = "yoo :"   # missing condition
+    source = "yoo :"  # missing condition
     tokens = OrmLexer(source, oromo_adapter).tokenize()
     with pytest.raises(OrmSyntaxError) as exc_info:
         OrmParser(oromo_adapter).parse(tokens)

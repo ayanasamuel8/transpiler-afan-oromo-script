@@ -6,6 +6,7 @@ language-specific keywords/builtins into their Python equivalents.
 
 This is the first stage of the OromScript transpile pipeline.
 """
+
 from __future__ import annotations
 
 import io
@@ -51,9 +52,7 @@ class OrmLexer:
             OrmLexError: If the source cannot be tokenised.
         """
         try:
-            raw = list(
-                py_tokenize.generate_tokens(io.StringIO(self._source).readline)
-            )
+            raw = list(py_tokenize.generate_tokens(io.StringIO(self._source).readline))
         except py_tokenize.TokenError as exc:
             raise OrmLexError(
                 code="E0001",

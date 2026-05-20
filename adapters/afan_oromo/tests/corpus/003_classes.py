@@ -5,6 +5,8 @@ class Barataa:
         self.umri = umri
 
     def of_ibsi(self):
-        print(f'{self.maqaa}: {self.umri}')
-b = Barataa('Chaltu', 20)
+        print(f"{self.maqaa}: {self.umri}")
+
+
+b = Barataa("Chaltu", 20)
 b.of_ibsi()

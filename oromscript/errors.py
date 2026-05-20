@@ -4,6 +4,7 @@ oromscript.errors
 Structured error types for all pipeline stages.
 Error messages are localised via the active adapter's error_messages.json.
 """
+
 from __future__ import annotations
 
 

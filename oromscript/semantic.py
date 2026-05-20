@@ -6,6 +6,7 @@ with original source-map information.
 
 This is the third stage of the OromScript transpile pipeline.
 """
+
 from __future__ import annotations
 
 import ast
@@ -31,7 +32,7 @@ class SemanticAnalyser(ast.NodeVisitor):
         self._lines = source_lines
         self._strict = strict
         self._scope: _Scope = _Scope()
-        self._orm_line_map: dict[int, int] = {}   # ast node id → orm_line
+        self._orm_line_map: dict[int, int] = {}  # ast node id → orm_line
 
     def analyse(self, tree: ast.AST) -> tuple[ast.AST, SourceMap]:
         """Run analysis pass.
@@ -53,7 +54,7 @@ class SemanticAnalyser(ast.NodeVisitor):
         self.generic_visit(node)
         self._scope = self._scope.parents
 
-    visit_AsyncFunctionDef = visit_FunctionDef   # type: ignore[assignment]
+    visit_AsyncFunctionDef = visit_FunctionDef  # type: ignore[assignment]
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         self._scope[node.name] = "class"
@@ -74,12 +75,13 @@ class SemanticAnalyser(ast.NodeVisitor):
             and node.id not in self._scope
             and node.id not in dir(__builtins__)
         ):
-                from .errors import OrmNameError
-                raise OrmNameError(
-                    code="E0020",
-                    message=f"Name '{node.id}' is not defined",
-                    orm_line=getattr(node, "lineno", 0),
-                    orm_col=getattr(node, "col_offset", 0),
-                    lang="",
-                    context={"name": node.id},
-                )
+            from .errors import OrmNameError
+
+            raise OrmNameError(
+                code="E0020",
+                message=f"Name '{node.id}' is not defined",
+                orm_line=getattr(node, "lineno", 0),
+                orm_col=getattr(node, "col_offset", 0),
+                lang="",
+                context={"name": node.id},
+            )

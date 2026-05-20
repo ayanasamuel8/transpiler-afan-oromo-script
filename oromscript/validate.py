@@ -5,7 +5,7 @@ from pathlib import Path
 def validate_adapters(paths: list[Path]) -> bool:
     """Validate adapter directories against the JSON schema."""
     import jsonschema
-    
+
     schema_path = Path(__file__).parent.parent / "schemas" / "keyword_map" / "v1.json"
     if not schema_path.exists():
         schema = {
@@ -14,17 +14,17 @@ def validate_adapters(paths: list[Path]) -> bool:
             "properties": {
                 "keywords": {
                     "type": "object",
-                    "additionalProperties": {"type": "string", "minLength": 1}
+                    "additionalProperties": {"type": "string", "minLength": 1},
                 },
                 "builtins": {
                     "type": "object",
-                    "additionalProperties": {"type": "string", "minLength": 1}
-                }
-            }
+                    "additionalProperties": {"type": "string", "minLength": 1},
+                },
+            },
         }
     else:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        
+
     ok = True
     for p in paths:
         kmap = p / "keyword_map.json"

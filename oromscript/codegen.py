@@ -5,6 +5,7 @@ Generates Python source from an annotated AST using ast.unparse().
 
 This is the fourth (and final source-emitting) stage of the pipeline.
 """
+
 from __future__ import annotations
 
 import ast

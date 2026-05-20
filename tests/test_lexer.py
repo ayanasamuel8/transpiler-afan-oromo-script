@@ -49,8 +49,10 @@ def test_token_immutability(oromo_adapter):
     lexer.tokenize()
     assert list(lexer._source) == tokens_before
 
+
 def test_lexer_token_error():
     from oromscript import transpile
+
     with pytest.raises(OrmLexError) as exc:
-        transpile('agarsiisi("', lang='afan_oromo')
+        transpile('agarsiisi("', lang="afan_oromo")
     assert exc.value.code == "E0001"

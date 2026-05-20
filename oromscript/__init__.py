@@ -8,6 +8,7 @@ Public API::
     py_src = transpile('agarsiisi("Akkam!")', lang='afan_oromo')
     execute('agarsiisi("Akkam!")', lang='afan_oromo')
 """
+
 from __future__ import annotations
 
 import typing
@@ -42,11 +43,9 @@ def transpile(
         py_source if emit_map is False, else (py_source, map_json).
     """
     adapter = AdapterRegistry.get(lang)
-    tokens  = OrmLexer(source, adapter).tokenize()
-    tree    = OrmParser(adapter).parse(tokens)
-    tree, src_map = SemanticAnalyser(
-        source.splitlines(), strict=strict
-    ).analyse(tree)
+    tokens = OrmLexer(source, adapter).tokenize()
+    tree = OrmParser(adapter).parse(tokens)
+    tree, src_map = SemanticAnalyser(source.splitlines(), strict=strict).analyse(tree)
     py_source, map_json = CodeGen().generate(
         tree, source_map=src_map if emit_map else None
     )

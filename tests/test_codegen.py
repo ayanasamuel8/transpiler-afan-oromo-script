@@ -23,7 +23,7 @@ def test_emit_map_returns_tuple():
     assert isinstance(result, tuple)
     assert len(result) == 2
     py_src, map_json = result
-    assert 'print' in py_src
+    assert "print" in py_src
     assert '"version"' in map_json
 
 

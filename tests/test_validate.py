@@ -11,6 +11,7 @@ from oromscript.cli import main
 def runner():
     return CliRunner()
 
+
 def test_validate_adapter_missing_kmap(tmp_path, runner):
     adapter = tmp_path / "bad_adapter"
     adapter.mkdir()
@@ -18,17 +19,24 @@ def test_validate_adapter_missing_kmap(tmp_path, runner):
     assert result.exit_code == 1
     assert "E0050" in result.output
 
+
 def test_validate_adapter_duplicate(tmp_path, runner):
     adapter = tmp_path / "bad_adapter"
     adapter.mkdir()
-    (adapter / "keyword_map.json").write_text(json.dumps({
-        "$lang": "bad", "$version": "1.0",
-        "keywords": {"k1": "dup", "k2": "dup"},
-        "builtins": {}
-    }))
+    (adapter / "keyword_map.json").write_text(
+        json.dumps(
+            {
+                "$lang": "bad",
+                "$version": "1.0",
+                "keywords": {"k1": "dup", "k2": "dup"},
+                "builtins": {},
+            }
+        )
+    )
     result = runner.invoke(main, ["validate-adapter", str(adapter)])
     assert result.exit_code == 1
     assert "E0052" in result.output
+
 
 def test_validate_adapter_bad_json(tmp_path, runner):
     adapter = tmp_path / "bad_adapter"
@@ -37,6 +45,7 @@ def test_validate_adapter_bad_json(tmp_path, runner):
     result = runner.invoke(main, ["validate-adapter", str(adapter)])
     assert result.exit_code == 1
     assert "E0052" in result.output
+
 
 def test_validate_adapter_no_schema(tmp_path, runner, monkeypatch):
     monkeypatch.setattr(oromscript.validate, "__file__", str(tmp_path / "nonexistent"))

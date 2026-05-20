@@ -3,6 +3,7 @@ oromscript.cli
 ~~~~~~~~~~~~~~
 Click-based command-line interface for OromScript.
 """
+
 from __future__ import annotations
 
 import code
@@ -15,6 +16,7 @@ from . import execute, transpile
 from .errors import OrmError
 
 ADAPTERS_DIR = Path(__file__).parent.parent / "adapters"
+
 
 class OrmConsole(code.InteractiveConsole):
     def __init__(self, lang: str) -> None:
@@ -108,6 +110,7 @@ def check(file: Path, lang: str, strict: bool) -> None:
 def repl(lang: str) -> None:
     """Start an interactive OromScript REPL."""
     import contextlib
+
     with contextlib.suppress(ImportError):
         import readline  # noqa: F401
     OrmConsole(lang=lang).interact(banner=f"OromScript REPL ({lang}) — Ctrl+D to exit")
@@ -118,6 +121,7 @@ def repl(lang: str) -> None:
 def new_lang(lang_name: str) -> None:
     """Scaffold a new language adapter directory."""
     from .scaffold import scaffold_adapter
+
     scaffold_adapter(lang_name, ADAPTERS_DIR)
 
 
@@ -126,8 +130,10 @@ def new_lang(lang_name: str) -> None:
 def validate_adapter(paths: tuple[Path, ...]) -> None:
     """Validate adapter directories against the JSON schema."""
     from .validate import validate_adapters
+
     ok = validate_adapters(list(paths))
     sys.exit(0 if ok else 1)
+
 
 if __name__ == "__main__":
     main()
