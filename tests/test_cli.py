@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import sys
 import pytest
 from click.testing import CliRunner
+
 from oromscript.cli import main
+
 
 @pytest.fixture
 def runner():

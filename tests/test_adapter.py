@@ -1,7 +1,9 @@
+
 import pytest
-from pathlib import Path
-from oromscript.adapter import AdapterRegistry, Adapter
+
+from oromscript.adapter import Adapter, AdapterRegistry
 from oromscript.errors import OrmAdapterError
+
 
 def test_adapter_load_missing_kmap(tmp_path):
     with pytest.raises(OrmAdapterError) as exc:

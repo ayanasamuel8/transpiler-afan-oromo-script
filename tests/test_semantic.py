@@ -1,6 +1,8 @@
 import pytest
+
 from oromscript import transpile
 from oromscript.errors import OrmNameError
+
 
 def test_semantic_strict_name_error():
     with pytest.raises(OrmNameError) as exc:

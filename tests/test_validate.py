@@ -1,8 +1,11 @@
 import json
+
 import pytest
 from click.testing import CliRunner
-from oromscript.cli import main
+
 import oromscript.validate
+from oromscript.cli import main
+
 
 @pytest.fixture
 def runner():
@@ -36,6 +39,6 @@ def test_validate_adapter_bad_json(tmp_path, runner):
     assert "E0052" in result.output
 
 def test_validate_adapter_no_schema(tmp_path, runner, monkeypatch):
-    monkeypatch.setattr(oromscript.validate, "__file__", "/tmp/nonexistent")
+    monkeypatch.setattr(oromscript.validate, "__file__", str(tmp_path / "nonexistent"))
     result = runner.invoke(main, ["validate-adapter", "adapters/afan_oromo"])
     assert result.exit_code == 0
