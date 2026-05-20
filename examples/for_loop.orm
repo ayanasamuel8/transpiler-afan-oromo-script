@@ -1,0 +1,10 @@
+# Fakkeenya Hanga (For Loop Example)
+
+agarsiisi("Lakkofsa 1 hanga 5:")
+hanga i keessa lakkoofsa(1, 6):
+    agarsiisi(i)
+
+agarsiisi("\nTarree keessa darbuu:")
+maqaa_tarree = ["Alii", "Bontu", "Caalaa"]
+hanga maqaa keessa maqaa_tarree:
+    agarsiisi("Nagaa buusii: " + maqaa)

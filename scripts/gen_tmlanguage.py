@@ -19,6 +19,15 @@ def main():
         "scopeName": "source.afan-oromo",
         "patterns": [
             {
+                "include": "#classes"
+            },
+            {
+                "include": "#functions"
+            },
+            {
+                "include": "#self"
+            },
+            {
                 "include": "#keywords"
             },
             {
@@ -26,6 +35,59 @@ def main():
             }
         ],
         "repository": {
+            "classes": {
+                "match": r"(?x)\b(gosa)\s+([a-zA-Z_]\w*)",
+                "captures": {
+                    "1": {
+                        "name": "keyword.control.class.afan-oromo"
+                    },
+                    "2": {
+                        "name": "entity.name.type.class.afan-oromo"
+                    }
+                }
+            },
+            "functions": {
+                "begin": r"(?x)\b(hojii)\s+([a-zA-Z_]\w*)\s*(\()",
+                "beginCaptures": {
+                    "1": {
+                        "name": "keyword.control.def.afan-oromo"
+                    },
+                    "2": {
+                        "name": "entity.name.function.afan-oromo"
+                    },
+                    "3": {
+                        "name": "punctuation.definition.parameters.begin.afan-oromo"
+                    }
+                },
+                "end": r"(\))",
+                "endCaptures": {
+                    "1": {
+                        "name": "punctuation.definition.parameters.end.afan-oromo"
+                    }
+                },
+                "patterns": [
+                    {
+                        "match": r"\bof\b",
+                        "name": "variable.language.special.self.afan-oromo"
+                    },
+                    {
+                        "match": r"([a-zA-Z_]\w*)",
+                        "captures": {
+                            "1": {
+                                "name": "variable.parameter.function.language.afan-oromo"
+                            }
+                        }
+                    },
+                    {
+                        "match": r",",
+                        "name": "punctuation.separator.parameters.afan-oromo"
+                    }
+                ]
+            },
+            "self": {
+                "match": r"\bof\b",
+                "name": "variable.language.special.self.afan-oromo"
+            },
             "keywords": {
                 "patterns": [
                     {

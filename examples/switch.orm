@@ -1,0 +1,19 @@
+# Fakkeenya Walsimsiisi (Switch/Match Example - Python 3.10+)
+
+hojii guyyaa_filadhu(guyyaa):
+    walsimsiisi guyyaa:
+        haala 1:
+            deebi "Wiixata"
+        haala 2:
+            deebi "Kibxata"
+        haala 3:
+            deebi "Roobii"
+        haala 4:
+            deebi "Kamisa"
+        haala 5:
+            deebi "Jimaata"
+        haala _:
+            deebi "Sanbata ykn Dilbata"
+
+agarsiisi("Guyyaa 3ffaa: " + guyyaa_filadhu(3))
+agarsiisi("Guyyaa 6ffaa: " + guyyaa_filadhu(6))

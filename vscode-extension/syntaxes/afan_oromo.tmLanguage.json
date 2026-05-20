@@ -4,6 +4,15 @@
   "scopeName": "source.afan-oromo",
   "patterns": [
     {
+      "include": "#classes"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#self"
+    },
+    {
       "include": "#keywords"
     },
     {
@@ -11,11 +20,64 @@
     }
   ],
   "repository": {
+    "classes": {
+      "match": "(?x)\\b(gosa)\\s+([a-zA-Z_]\\w*)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.class.afan-oromo"
+        },
+        "2": {
+          "name": "entity.name.type.class.afan-oromo"
+        }
+      }
+    },
+    "functions": {
+      "begin": "(?x)\\b(hojii)\\s+([a-zA-Z_]\\w*)\\s*(\\()",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.def.afan-oromo"
+        },
+        "2": {
+          "name": "entity.name.function.afan-oromo"
+        },
+        "3": {
+          "name": "punctuation.definition.parameters.begin.afan-oromo"
+        }
+      },
+      "end": "(\\))",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.parameters.end.afan-oromo"
+        }
+      },
+      "patterns": [
+        {
+          "match": "\\bof\\b",
+          "name": "variable.language.special.self.afan-oromo"
+        },
+        {
+          "match": "([a-zA-Z_]\\w*)",
+          "captures": {
+            "1": {
+              "name": "variable.parameter.function.language.afan-oromo"
+            }
+          }
+        },
+        {
+          "match": ",",
+          "name": "punctuation.separator.parameters.afan-oromo"
+        }
+      ]
+    },
+    "self": {
+      "match": "\\bof\\b",
+      "name": "variable.language.special.self.afan-oromo"
+    },
     "keywords": {
       "patterns": [
         {
           "name": "keyword.control.afan-oromo",
-          "match": "\\b(Sobaa|Wanti_hin_jirre|Dhugaa|fi|akka|mirkaanessi|yeroo_eeguu|eegi|addaan_kut|gosa|itti_fufuu|hojii|haqi|yookaan|yoo_miti|dogoggora|dhuma|hanga|irra|addunyaa|yoo|fidi|keessa|dha|hojii_gabaabaa|naannoo_miti|miti|yookaan_immoo|darbii|ol_kaasi|deebi|yaali|yeroo|waliin|kennii|kennii_irra)\\b"
+          "match": "\\b(Sobaa|Wanti_hin_jirre|Dhugaa|fi|akka|mirkaanessi|yeroo_eeguu|eegi|addaan_kut|gosa|itti_fufuu|hojii|haqi|yookaan|yoo_miti|dogoggora|dhuma|hanga|irra|addunyaa|yoo|fidi|keessa|dha|hojii_gabaabaa|naannoo_miti|miti|yookaan_immoo|darbii|ol_kaasi|deebi|yaali|yeroo|waliin|kennii|kennii_irra|walsimsiisi|haala)\\b"
         },
         {
           "name": "support.function.builtin.afan-oromo",

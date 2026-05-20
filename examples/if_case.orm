@@ -1,0 +1,10 @@
+# Fakkeenya Yoo (If Case Example)
+
+lakki_tokko = 15
+
+yoo lakki_tokko > 20:
+    agarsiisi("Lakkoofsichi 20 irra caala.")
+yookaan lakki_tokko > 10:
+    agarsiisi("Lakkoofsichi 10 fi 20 gidduu jira.")
+yoo_miti:
+    agarsiisi("Lakkoofsichi 10 ykn isaa gadi.")

@@ -39,7 +39,9 @@
     "while":    "yeroo",
     "with":     "waliin",
     "yield":    "kennii",
-    "yield from": "kennii_irra"
+    "yield from": "kennii_irra",
+    "match":    "walsimsiisi",
+    "case":     "haala"
   },
   "builtins": {
     "print":     "agarsiisi",
