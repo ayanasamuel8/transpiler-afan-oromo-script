@@ -1,7 +1,13 @@
 {
   "name": "oromscript",
   "displayName": "OromScript",
+  "publisher": "oromscript",
+  "description": "Afan Oromo Transpiler syntax highlighting for VS Code.",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oromscript/oromscript"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },

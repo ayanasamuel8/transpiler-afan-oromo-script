@@ -7,6 +7,8 @@ Error messages are localised via the active adapter's error_messages.json.
 
 from __future__ import annotations
 
+from typing import Any
+
 
 class OrmError(Exception):
     """Base class for all OromScript errors."""
@@ -19,7 +21,7 @@ class OrmError(Exception):
         orm_line: int = 0,
         orm_col: int = 0,
         lang: str = "afan_oromo",
-        context: dict | None = None,
+        context: dict[str, Any] | None = None,
     ) -> None:
         self.code = code
         self.message = message

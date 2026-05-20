@@ -20,7 +20,7 @@ jobs:
           cache: pip
 
       - name: Install linting tools
-        run: pip install ruff mypy black
+        run: pip install ruff mypy black types-jsonschema
 
       - name: ruff (fast linter)
         run: ruff check oromscript/ adapters/ tests/

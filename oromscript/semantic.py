@@ -16,7 +16,7 @@ from collections import ChainMap
 SourceMap = dict[int, int]
 
 
-class _Scope(ChainMap):
+class _Scope(ChainMap[str, str]):
     """Nested symbol table using ChainMap for O(1) push/pop."""
 
 

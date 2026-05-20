@@ -1,0 +1,41 @@
+site_name: OromScript
+site_description: A Python-based transpiler for native spoken languages.
+repo_url: https://github.com/your-username/transpiler-afan-oromo-script
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: ["."]
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - Keyword Reference: keyword-reference.md
+  - Adding a Language: adding-a-language.md
+  - API Reference: api-reference.md
+  - Contributing: contributing.md
+  - Design Specification: OromScript_Design_Specification.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true

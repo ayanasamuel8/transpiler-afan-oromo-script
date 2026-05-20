@@ -1,0 +1,1517 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python-based transpiler for native spoken languages.">
+      
+      
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Design Specification - OromScript</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#table-of-contents" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="OromScript" class="md-header__button md-logo" aria-label="OromScript" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OromScript
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Design Specification
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/your-username/transpiler-afan-oromo-script" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../keyword-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Keyword Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../adding-a-language/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Adding a Language
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Design Specification
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="OromScript" class="md-nav__button md-logo" aria-label="OromScript" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OromScript
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/your-username/transpiler-afan-oromo-script" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../keyword-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keyword Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-a-language/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Language
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<p><strong>OROMSCRIPT</strong></p>
+<p>Transpiler Design Specification</p>
+<p><em>Write Python in Afan Oromo — Execute Anywhere</em></p>
+<p>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
+<p>Version 1.0  ·  May 2025  ·  Open Source (MIT)</p>
+<p><a href="https://github.com/ayanasamuel8/transpiler-afan-oromo-script">github.com/ayanasamuel8/transpiler-afan-oromo-script</a></p>
+<h1 id="table-of-contents"><strong>Table of Contents</strong></h1>
+<h1 id="1-executive-summary"><strong>1. Executive Summary</strong></h1>
+<p>OromScript is an open-source, language-localisation transpiler platform that lets developers write Python programs using <strong>Afan Oromo</strong> keywords, identifiers, and idioms. The transpiler parses Oromo-syntax source files (.orm), translates them into standard Python, and executes or outputs the result — with no measurable runtime overhead above Python itself.</p>
+<p><strong>Core value proposition:</strong> lower the barrier to programming for the 40+ million Afan Oromo speakers worldwide, and provide a reusable, well-documented platform so any other language community (Amharic, Tigrinya, Somali, …) can add their own keyword layer in under a day.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Scope boundaries (what this design covers) • Afan Oromo → Python 3.12+ full-language transpiler (all Python constructs) • A plugin/adapter system for adding new languages (Amharic, etc.) • CLI tool, library API, VS Code syntax highlighting extension • Comprehensive test suite, CI/CD pipeline, contribution workflow • Localized error messages in Oromo (and extensible for other languages) • NOT in scope for v1: JIT compilation, custom C-extension ABI, IDE debugger protocol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="2-goals-non-goals"><strong>2. Goals &amp; Non-Goals</strong></h1>
+<h2 id="21-goals"><strong>2.1 Goals</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Priority</th>
+<th style="text-align: left;">Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>P0</strong></td>
+<td style="text-align: left;">Full Python parity — every Python 3 construct has an Afan Oromo equivalent</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P0</strong></td>
+<td style="text-align: left;">Transpile-time only overhead; generated Python must be identical to hand-written Python</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P0</strong></td>
+<td style="text-align: left;">Plugin architecture: add a new language by supplying one JSON keyword map + optional grammar hooks</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P1</strong></td>
+<td style="text-align: left;">Localized, actionable error messages (line/col, suggestion, Oromo text)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P1</strong></td>
+<td style="text-align: left;">VS Code extension with syntax highlighting for .orm files</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P1</strong></td>
+<td style="text-align: left;">CI/CD with automated tests, linting, and release publishing</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P2</strong></td>
+<td style="text-align: left;">Source-map support so stack traces reference .orm lines</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>P2</strong></td>
+<td style="text-align: left;">REPL (interactive Oromo Python shell)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="22-non-goals-v1"><strong>2.2 Non-Goals (v1)</strong></h2>
+<ul>
+<li>
+<p>Custom bytecode compiler or JIT — Python's CPython handles execution</p>
+</li>
+<li>
+<p>Full IDE debugger (DAP) integration — deferred to v2</p>
+</li>
+<li>
+<p>Transpiling to languages other than Python — possible in v2 via IR</p>
+</li>
+<li>
+<p>GUI application — CLI + library is sufficient for v1</p>
+</li>
+</ul>
+<h1 id="3-architecture-overview"><strong>3. Architecture Overview</strong></h1>
+<p>OromScript follows a classic multi-phase compiler pipeline. The key design decision is to keep the Oromo-specific logic (lexer keyword map, grammar patches) strictly isolated from the generic AST manipulation and Python code-generation layers. This is what enables easy addition of new languages.</p>
+<p><strong>Figure 1 — High-level transpiler pipeline</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">┌──────────────────────────────────────────────────────────────────────┐   │                         OROMSCRIPT PIPELINE                          │   └──────────────────────────────────────────────────────────────────────┘                                                                               .orm source file                                                                │                                                                          ▼                                                                    ┌─────────────┐    keyword_map.json   ┌──────────────────────────────┐    │   LEXER     │◄─────────────────────│  Language Adapter (Oromo)    │    │  (Tokenizer)│                       │  • keyword_map.json          │    └─────────────┘                       │  • grammar_hooks.py (opt.)   │          │                               └──────────────────────────────┘          │ token stream                                                             ▼                                                                    ┌─────────────┐                                                           │   PARSER    │  (Python grammar extended with adapter hooks)              │  (LALR/PEG) │                                                           └─────────────┘                                                                 │                                                                          │ AST (language-neutral)                                                   ▼                                                                    ┌─────────────┐                                                           │  SEMANTIC   │  (symbol table, scope, type hints validation)              │  ANALYSER   │                                                           └─────────────┘                                                                 │                                                                          │ annotated AST                                                            ▼                                                                    ┌─────────────┐                                                           │  CODE GEN   │  ast.unparse() → standard Python source                   │  + SOURCEMAP│  produces .py + .orm.map (line/col mapping)               └─────────────┘                                                                 │                                                                          ├── output.py  (for --emit-python)                                        └──► CPython   (for --run)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="31-language-adapter-plugin-concept"><strong>3.1 Language Adapter (Plugin) Concept</strong></h2>
+<p>A Language Adapter is the only artefact a contributor needs to create to localise the platform for a new language. It consists of:</p>
+<ul>
+<li>
+<p><strong>keyword_map.json</strong> — maps every Python keyword / builtin to the local-language equivalent</p>
+</li>
+<li>
+<p><strong>grammar_hooks.py</strong> (optional) — Python module with hooks if the language needs non-trivial grammar extensions (e.g. right-to-left parsing, agglutinative morphology)</p>
+</li>
+<li>
+<p><strong>error_messages.json</strong> — localised error strings keyed by error code</p>
+</li>
+<li>
+<p><strong>tests/</strong> — adapter-specific test corpus</p>
+</li>
+</ul>
+<p><strong>Figure 2 — Language Adapter file structure</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">adapters/   ├── afan_oromo/          ← shipped with this repo   │   ├── keyword_map.json   │   ├── grammar_hooks.py   │   ├── error_messages.json   │   └── tests/   └── amharic/             ← future adapter (community-contributed)       ├── keyword_map.json       └── ...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="32-why-python-as-the-ir-intermediate-representation"><strong>3.2 Why Python as the IR (Intermediate Representation)</strong></h2>
+<p>Rather than designing a custom IR, v1 uses Python source text as the IR. This gives us:</p>
+<ul>
+<li>
+<p>Zero execution overhead — CPython runs the output directly</p>
+</li>
+<li>
+<p>Full ecosystem compatibility — pip packages, type checkers, debuggers all work</p>
+</li>
+<li>
+<p>Simpler code generator — we use Python's built-in ast.unparse()</p>
+</li>
+<li>
+<p>Easy verification — diff the generated .py against expected output in tests</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Future IR note (v2 consideration) If the project later targets multiple backends (JavaScript, Rust, etc.), a proper IR (e.g. LLVM or a custom DAG) can be introduced between the Semantic Analyser and Code Gen layers without touching the Lexer, Parser, or Adapter.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="4-detailed-component-design"><strong>4. Detailed Component Design</strong></h1>
+<h2 id="41-lexer"><strong>4.1 Lexer</strong></h2>
+<p>The Lexer inherits from Python's own tokenize module. It intercepts the token stream and applies a reverse keyword map: any token whose string value matches a local-language keyword is replaced with the corresponding Python keyword token before the parser sees it. This means the parser is always working with standard Python tokens and requires no changes per language.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"># oromscript/lexer.py (simplified) import tokenize, io from .adapter import AdapterRegistry class OromLexer:     def __init__(self, source: str, lang: str \= 'afan_oromo'):         self.adapter \= AdapterRegistry.get(lang)         self.source \= source     def tokenize(self):         tokens \= list(tokenize.generate_tokens(             io.StringIO(self.source).readline         ))         return [self._translate(tok) for tok in tokens]     def _translate(self, tok):         if tok.type \== tokenize.NAME:             py_kw \= self.adapter.to_python_keyword(tok.string)             if py_kw:                 return tok._replace(string=py_kw)         return tok</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="42-parser"><strong>4.2 Parser</strong></h2>
+<p>The parser uses <strong>Python's built-in</strong> ast.parse() on the translated token stream (re-assembled into a string via tokenize.untokenize()). This keeps the parser zero-maintenance — as CPython evolves, our parser evolves for free. Grammar hooks in the adapter can pre-process the source string before re-assembly for languages with structural differences (e.g. postfix function calls).</p>
+<h2 id="43-semantic-analyser"><strong>4.3 Semantic Analyser</strong></h2>
+<p>The semantic analyser performs a single-pass walk of the AST to:</p>
+<ul>
+<li>
+<p>Build a symbol table (scoped dictionary of names → type hints)</p>
+</li>
+<li>
+<p>Validate that all referenced names are defined (optional strict mode)</p>
+</li>
+<li>
+<p>Annotate nodes with source-map information (original .orm line/col)</p>
+</li>
+<li>
+<p>Detect common localisation mistakes (e.g., mixing Oromo and Python keywords)</p>
+</li>
+</ul>
+<h2 id="44-code-generator"><strong>4.4 Code Generator</strong></h2>
+<p>The code generator calls ast.unparse(tree) to produce Python source from the annotated AST. It also emits a JSON source-map file (.orm.map) mapping every generated line back to the original Oromo source line, enabling localised stack traces.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"># oromscript/codegen.py import ast, json class CodeGen:     def generate(self, tree: ast.AST, source_map: dict) -&gt; tuple[str, str]:         py_source \= ast.unparse(tree)         map_json  \= json.dumps(source_map, ensure_ascii=False, indent=2)         return py_source, map_json</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="45-error-reporting"><strong>4.5 Error Reporting</strong></h2>
+<p>Errors are structured objects carrying a numeric code, the offending .orm line/col, and a localised message. The error renderer looks up the message template from the active adapter's error_messages.json and formats it with context-specific substitution variables.</p>
+<p><strong>Figure 3 — Error message flow</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">OromSyntaxError(code=E0042, line=7, col=3, context={'token': 'yoo'})          │          ▼   ErrorRenderer(adapter='afan_oromo')          │  looks up error_messages.json[E0042]          │  template: "Wardii himaa '{token}' iddoo dha'uu hin qabu — sarara {line}"          ▼   stderr: error[E0042] sarara 7, tuqaa 3:           Wardii himaa 'yoo' iddoo dha'uu hin qabu — sarara 7           Yaadannoo: 'yoo' jechuun 'if' jechuu dha; akka armaan gadiitti fayyadami:             yoo gatii &gt; 0:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="46-adapter-registry"><strong>4.6 Adapter Registry</strong></h2>
+<p>The AdapterRegistry discovers adapters at startup by scanning the adapters/ directory for subdirectories containing a keyword_map.json. Adapters can also be installed as PyPI packages following the naming convention oromscript-lang-\&lt;name&gt;, allowing community adapters to be distributed independently.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"># oromscript/adapter.py class AdapterRegistry:     _adapters: dict[str, Adapter] \= {}     @classmethod     def discover(cls, adapters_dir: Path):         for d in adapters_dir.iterdir():             if (d / 'keyword_map.json').exists():                 cls._adapters[d.name] \= Adapter.load(d)     @classmethod     def get(cls, lang: str) -&gt; Adapter:         if lang not in cls._adapters:             raise AdapterNotFoundError(lang)         return cls._adapters[lang]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="47-cli-interface"><strong>4.7 CLI Interface</strong></h2>
+<p>The command-line interface is built with Click and supports:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"># Usage examples oromscript run hello.orm               # transpile + execute oromscript compile hello.orm           # emit hello.py oromscript compile hello.orm --map     # emit hello.py + hello.orm.map oromscript check hello.orm             # lint only, no output oromscript repl                        # interactive Oromo Python REPL oromscript new-lang amharic            # scaffold a new adapter oromscript --lang amharic run hi.amh  # use a different adapter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="48-library-api"><strong>4.8 Library API</strong></h2>
+<p>OromScript is importable as a Python library so it can be embedded in notebooks, build tools, or web services:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">from oromscript import transpile, execute py_source \= transpile('agarsiisi("Akkam!")', lang='afan_oromo') result    \= execute('agarsiisi("Akkam!")', lang='afan_oromo')</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="5-keyword-map-design"><strong>5. Keyword Map Design</strong></h1>
+<p>The keyword map is the heart of each language adapter. It is a UTF-8 JSON file with two top-level objects: keywords and builtins.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">// adapters/afan_oromo/keyword_map.json  (excerpt) {   "$schema": "https://oromscript.dev/schemas/keyword_map/v1.json",   "$lang": "afan_oromo",   "$version": "1.0.0",   "$description": "Afan Oromo keyword mapping for OromScript",   "keywords": {     "if":       "yoo",     "else":     "yoo_miti",     "elif":     "yookaan",     "for":      "hanga",     "while":    "yeroo",     "def":      "hojii",     "class":    "gosa",     "return":   "deebi",     "import":   "fidi",     "from":     "irra",     "as":       "akka",     "try":      "yaali",     "except":   "dogoggora",     "finally":  "dhuma",     "with":     "waliin",     "pass":     "itti_fufuu",     "break":    "addaan_kut",     "continue": "itti_fufuu",     "and":      "fi",     "or":       "yookaan",     "not":      "miti",     "in":       "keessa",     "is":       "dha",     "lambda":   "hanga",     "True":     "Dhugaa",     "False":    "Sobaa",     "None":     "Wanti_hin_jirre"   },   "builtins": {     "print":    "agarsiisi",     "input":    "gaafadhu",     "len":      "dheerina",     "range":    "lakkoofsa",     "list":     "tarree",     "dict":     "galmee",     "str":      "barruu",     "int":      "lakki",     "float":    "lakki_caccabaa",     "open":     "bani"   } }</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The schema at oromscript.dev/schemas/keyword_map/v1.json enforces this structure and is validated in CI. Adding a new keyword requires: (1) add entry to keyword_map.json, (2) add a test case, (3) open a PR.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Design rule: 1-to-1 mapping only in v1 Each Python keyword maps to exactly one local keyword, and each local keyword maps to exactly one Python keyword. Many-to-one mappings (synonyms) are deferred to v2 to keep the lexer translation logic O(1) and deterministic.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="6-sample-afan-oromo-programs"><strong>6. Sample Afan Oromo Programs</strong></h1>
+<h2 id="61-hello-world"><strong>6.1 Hello World</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Afan Oromo (.orm) # Baga nagaan dhufte! agarsiisi("Akkam, Addunyaa!")</th>
+<th style="text-align: left;">Generated Python (.py) # Baga nagaan dhufte! print("Akkam, Addunyaa!")</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="62-functions-and-conditionals"><strong>6.2 Functions and Conditionals</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Afan Oromo (.orm) hojii faarfannaa(lakki):     yoo lakki % 2 \== 0:         deebi 'lakkoofsa lakkaa'     yoo_miti:         deebi 'lakkoofsa baayyee' hanga i keessa lakkoofsa(1, 11):     agarsiisi(faarfannaa(i))</th>
+<th style="text-align: left;">Generated Python (.py) def faarfannaa(lakki):     if lakki % 2 \== 0:         return 'lakkoofsa lakkaa'     else:         return 'lakkoofsa baayyee' for i in range(1, 11):     print(faarfannaa(i))</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="63-classes"><strong>6.3 Classes</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Afan Oromo (.orm) gosa Barataa:     hojii __init__(of, maqaa, umri):         of.maqaa \= maqaa         of.umri  \= umri     hojii of_ibsi(of):         agarsiisi(f'{of.maqaa}: {of.umri}') b \= Barataa('Chaltu', 20) b.of_ibsi()</th>
+<th style="text-align: left;">Generated Python (.py) class Barataa:     def __init__(self, maqaa, umri):         self.maqaa \= maqaa         self.umri  \= umri     def of_ibsi(self):         print(f'{self.maqaa}: {self.umri}') b \= Barataa('Chaltu', 20) b.of_ibsi()</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Note on 'self' In the Afan Oromo adapter, 'self' is mapped to 'of' (meaning 'itself' / 'oneself' in Oromo). The keyword_map.json entry is: "self": "of". Adapter authors can choose any culturally appropriate equivalent.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="7-repository-structure"><strong>7. Repository Structure</strong></h1>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">transpiler-afan-oromo-script/ ├── .github/ │   ├── workflows/ │   │   ├── ci.yml              # lint + test on every PR │   │   ├── release.yml         # tag → PyPI publish │   │   └── docs.yml            # build &amp; deploy docs site │   ├── ISSUE_TEMPLATE/ │   │   ├── bug_report.md │   │   ├── keyword_request.md  # request a new Oromo keyword │   │   └── new_language.md     # request a new language adapter │   ├── PULL_REQUEST_TEMPLATE.md │   └── CODEOWNERS │ ├── adapters/                   # Language adapter plugins │   └── afan_oromo/ │       ├── keyword_map.json │       ├── grammar_hooks.py │       ├── error_messages.json │       └── tests/ │           ├── test_keywords.py │           └── corpus/         # .orm + expected .py pairs │ ├── oromscript/                 # Core library │   ├── __init__.py │   ├── lexer.py │   ├── parser.py │   ├── semantic.py │   ├── codegen.py │   ├── sourcemap.py │   ├── errors.py │   ├── adapter.py              # AdapterRegistry │   └── cli.py                  # Click CLI entry point │ ├── tests/                      # Core engine tests │   ├── test_lexer.py │   ├── test_parser.py │   ├── test_codegen.py │   ├── test_cli.py │   └── test_performance.py     # benchmark vs raw Python │ ├── schemas/ │   └── keyword_map/ │       └── v1.json             # JSON Schema for keyword_map.json │ ├── vscode-extension/           # VS Code syntax highlighting │   ├── package.json │   ├── syntaxes/ │   │   └── afan_oromo.tmLanguage.json │   └── README.md │ ├── docs/ │   ├── index.md │   ├── getting-started.md │   ├── keyword-reference.md │   ├── adding-a-language.md    # step-by-step guide │   ├── architecture.md │   ├── api-reference.md │   └── contributing.md │ ├── examples/ │   ├── hello_world.orm │   ├── fibonacci.orm │   ├── classes.orm │   └── web_scraper.orm         # real-world example │ ├── benchmarks/ │   └── bench.py                # transpile-time + runtime benchmarks │ ├── CHANGELOG.md ├── CONTRIBUTING.md ├── CODE_OF_CONDUCT.md ├── LICENSE                     # MIT ├── README.md ├── pyproject.toml              # PEP 517/518 build config └── Makefile                    # dev shortcuts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="8-performance-strategy"><strong>8. Performance Strategy</strong></h1>
+<p>The performance goal is that OromScript programs run indistinguishably from equivalent hand-written Python. This is achievable because the transpiler is a one-time preprocessing step — not an interpreter.</p>
+<h2 id="81-transpilation-speed"><strong>8.1 Transpilation Speed</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Operation</th>
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Target latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Tokenise 1000-line file</td>
+<td style="text-align: left;">Python tokenize (C extension)</td>
+<td style="text-align: left;">\&lt; 5 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;">Keyword translation</td>
+<td style="text-align: left;">O(1) dict lookup per token</td>
+<td style="text-align: left;">\&lt; 1 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;">Parse</td>
+<td style="text-align: left;">ast.parse() (CPython C)</td>
+<td style="text-align: left;">\&lt; 10 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;">Code gen</td>
+<td style="text-align: left;">ast.unparse() (CPython C)</td>
+<td style="text-align: left;">\&lt; 2 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Total transpile</strong></td>
+<td style="text-align: left;"><strong>—</strong></td>
+<td style="text-align: left;"><strong>\&lt; 20 ms for any file</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="82-runtime-performance"><strong>8.2 Runtime Performance</strong></h2>
+<ul>
+<li>
+<p>Generated .py is byte-for-byte equivalent to hand-written Python → CPython compiles it identically → zero runtime overhead</p>
+</li>
+<li>
+<p>Source-map JSON generation is optional (--map flag) and happens post-transpile</p>
+</li>
+<li>
+<p><strong>Caching:</strong> oromscript run caches compiled .pyc next to the .orm file (in __pycache__) and skips re-transpilation if the .orm mtime has not changed — identical to how Python's own import cache works</p>
+</li>
+</ul>
+<h2 id="83-future-c-extension-option"><strong>8.3 Future: C Extension Option</strong></h2>
+<p>If transpilation speed ever becomes a bottleneck (e.g. transpiling thousands of files in a CI build), the lexer loop can be re-implemented as a C extension using CPython's C API. The interface is already designed with this in mind: OromLexer exposes a single tokenize() method whose return type would not change.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Guideline Do not pre-optimise. Measure first with benchmarks/bench.py. The pure-Python implementation is the v1 baseline; a C extension is a v2 option only if benchmarks show a real bottleneck.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="9-adding-a-new-language-amharic-example"><strong>9. Adding a New Language (Amharic Example)</strong></h1>
+<p>This section is a step-by-step guide for a contributor who wants to add an Amharic adapter. The same steps apply to any language.</p>
+<ol>
+<li>Scaffold the adapter directory:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">oromscript new-lang amharic # Creates: adapters/amharic/keyword_map.json (template) #          adapters/amharic/error_messages.json (template) #          adapters/amharic/grammar_hooks.py (no-op stub) #          adapters/amharic/tests/</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Fill in keyword_map.json with Amharic equivalents:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">// adapters/amharic/keyword_map.json (excerpt) {   "$lang": "amharic",   "keywords": {     "if":    "ከሆነ",     "else":  "ካልሆነ",     "for":   "ለ",     "def":   "ሥራ",     "class": "ዓይነት",     "return":"መልስ"   },   "builtins": {     "print": "አሳይ",     "input": "ጠይቅ"   } }</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>
+<p>Add error messages in error_messages.json (Amharic text)</p>
+</li>
+<li>
+<p>Add test corpus: pairs of .amh + expected .py files in adapters/amharic/tests/corpus/</p>
+</li>
+<li>
+<p>Run tests:</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">pytest adapters/amharic/tests/ -v</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Validate keyword map schema:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">oromscript validate-adapter adapters/amharic/</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Open a Pull Request — CI will run schema validation + tests automatically</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Time estimate A complete, tested adapter for a new language typically takes 4–8 hours: • 2 h — keyword translation (using a dictionary or LLM assistance) • 1 h — error message localisation • 2 h — writing test corpus • 1 h — PR + review cycle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="10-cicd-pipeline"><strong>10. CI/CD Pipeline</strong></h1>
+<p><strong>Figure 4 — CI/CD flow</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Developer pushes branch / opens PR          │          ▼   ┌─────────────────────────────────────────────┐   │              GitHub Actions: ci.yml          │   │  Triggers: push to any branch, PR to main   │   │                                             │   │  Jobs (parallel):                           │   │  ┌─────────┐ ┌─────────┐ ┌──────────────┐  │   │  │  lint   │ │  test   │ │ schema-valid  │  │   │  │ ruff    │ │ pytest  │ │ jsonschema    │  │   │  │ mypy    │ │ 3.10    │ │ all adapters  │  │   │  │ black   │ │ 3.11    │ └──────────────┘  │   │  └─────────┘ │ 3.12    │                   │   │              └─────────┘                   │   └────────────────────┬────────────────────────┘                        │ all green                        ▼               PR can be merged                        │                        │ merge to main                        ▼   ┌─────────────────────────────────────────────┐   │           GitHub Actions: docs.yml           │   │  Build MkDocs site → deploy to GitHub Pages │   └─────────────────────────────────────────────┘                        │                        │ maintainer tags v1.2.3                        ▼   ┌─────────────────────────────────────────────┐   │          GitHub Actions: release.yml         │   │  Build wheel + sdist → publish to PyPI      │   │  Build VS Code .vsix → publish to Marketplace│   └─────────────────────────────────────────────┘</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="101-ciyml-annotated"><strong>10.1 ci.yml (annotated)</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">name: CI on:   push:     branches: ['**']   pull_request:     branches: [main] jobs:   lint:     runs-on: ubuntu-latest     steps:       - uses: actions/checkout@v4       - uses: actions/setup-python@v5         with: { python-version: '3.12' }       - run: pip install ruff mypy black       - run: ruff check oromscript/ adapters/       - run: black --check oromscript/ adapters/       - run: mypy oromscript/   test:     runs-on: ubuntu-latest     strategy:       matrix:         python-version: ['3.10', '3.11', '3.12']     steps:       - uses: actions/checkout@v4       - uses: actions/setup-python@v5         with: { python-version: '${{ matrix.python-version }}' }       - run: pip install -e '.[dev]'       - run: pytest tests/ adapters/*/tests/ -v --tb=short       - run: python benchmarks/bench.py --ci   # fail if &gt;20ms   schema:     runs-on: ubuntu-latest     steps:       - uses: actions/checkout@v4       - run: pip install jsonschema       - run: python -m oromscript.cli validate-adapter adapters/*/</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="11-testing-strategy"><strong>11. Testing Strategy</strong></h1>
+<h2 id="111-test-layers"><strong>11.1 Test layers</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Layer</th>
+<th style="text-align: left;">What is tested</th>
+<th style="text-align: left;">Tool</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Unit</td>
+<td style="text-align: left;">Lexer token translation, adapter loading, error formatting</td>
+<td style="text-align: left;">pytest</td>
+</tr>
+<tr>
+<td style="text-align: left;">Integration</td>
+<td style="text-align: left;">Full .orm → .py round-trip for every keyword</td>
+<td style="text-align: left;">pytest + corpus</td>
+</tr>
+<tr>
+<td style="text-align: left;">Execution</td>
+<td style="text-align: left;">.orm programs produce correct stdout/return values</td>
+<td style="text-align: left;">pytest + subprocess</td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance</td>
+<td style="text-align: left;">Transpile time \&lt; 20 ms; generated .py runs at native speed</td>
+<td style="text-align: left;">benchmarks/bench.py</td>
+</tr>
+<tr>
+<td style="text-align: left;">Schema</td>
+<td style="text-align: left;">Every keyword_map.json validates against JSON Schema</td>
+<td style="text-align: left;">jsonschema CLI</td>
+</tr>
+</tbody>
+</table>
+<h2 id="112-corpus-test-format"><strong>11.2 Corpus test format</strong></h2>
+<p>Each integration test is a pair of files:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">adapters/afan_oromo/tests/corpus/ ├── 001_hello.orm          # Oromo source ├── 001_hello.py           # Expected Python output ├── 002_for_loop.orm ├── 002_for_loop.py └── ...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The test runner transpiles each .orm and diffs the output against the .py reference. Any diff is a test failure. New contributors adding keywords must add at least one corpus pair.</p>
+<h2 id="113-coverage-requirement"><strong>11.3 Coverage requirement</strong></h2>
+<ul>
+<li>
+<p>Core engine: ≥ 90% line coverage (enforced in CI via pytest-cov)</p>
+</li>
+<li>
+<p>Adapter keyword_map.json: 100% of keywords must have at least one corpus test</p>
+</li>
+<li>
+<p>Error paths: every error code must have a test that triggers it</p>
+</li>
+</ul>
+<h1 id="12-contribution-workflow"><strong>12. Contribution Workflow</strong></h1>
+<p><strong>Figure 5 — PR lifecycle</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Contributor                 Maintainer       │                           │       │ fork repo                 │       │ create branch             │       │   feat/my-change          │       │                           │       │ make changes              │       │ run make test locally     │       │                           │       │──── open Pull Request ───►│       │                           │ CI runs automatically       │◄─── CI results ───────────│ (lint, test, schema)       │                           │       │ fix CI issues (if any)    │       │──── push fixes ──────────►│       │                           │ review + approve       │◄─── approval ─────────────│       │                           │       │                           │ squash merge to main       │                           │ CHANGELOG updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="121-branch-naming"><strong>12.1 Branch naming</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Prefix</th>
+<th style="text-align: left;">Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">feat/</td>
+<td style="text-align: left;">New feature or keyword</td>
+</tr>
+<tr>
+<td style="text-align: left;">fix/</td>
+<td style="text-align: left;">Bug fix</td>
+</tr>
+<tr>
+<td style="text-align: left;">lang/</td>
+<td style="text-align: left;">New language adapter</td>
+</tr>
+<tr>
+<td style="text-align: left;">docs/</td>
+<td style="text-align: left;">Documentation only</td>
+</tr>
+<tr>
+<td style="text-align: left;">chore/</td>
+<td style="text-align: left;">Tooling, CI, deps</td>
+</tr>
+</tbody>
+</table>
+<h2 id="122-pr-checklist-in-pull_request_templatemd"><strong>12.2 PR checklist (in PULL_REQUEST_TEMPLATE.md)</strong></h2>
+<ul>
+<li>
+<p>I have run make test and all tests pass</p>
+</li>
+<li>
+<p>I have added/updated tests for my change</p>
+</li>
+<li>
+<p>If adding a keyword: corpus pair .orm + .py added</p>
+</li>
+<li>
+<p>CHANGELOG.md updated under [Unreleased]</p>
+</li>
+<li>
+<p>Type annotations added/maintained (mypy clean)</p>
+</li>
+<li>
+<p>Docstrings updated for public API changes</p>
+</li>
+</ul>
+<h2 id="123-commit-message-convention-conventional-commits"><strong>12.3 Commit message convention (Conventional Commits)</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">feat(lexer): support multi-byte Oromo characters in identifiers fix(adapter): correct 'yoo_miti' → 'else' mapping lang(amharic): add initial Amharic adapter docs: add step-by-step guide for adding a language chore(ci): upgrade actions/setup-python to v5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="13-documentation-strategy"><strong>13. Documentation Strategy</strong></h1>
+<p>All documentation lives in docs/ and is built with MkDocs + Material theme, deployed to GitHub Pages on every merge to main.</p>
+<h2 id="131-documentation-pages"><strong>13.1 Documentation pages</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Page</th>
+<th style="text-align: left;">Audience &amp; content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">getting-started.md</td>
+<td style="text-align: left;">End users — install, write first .orm file, run it</td>
+</tr>
+<tr>
+<td style="text-align: left;">keyword-reference.md</td>
+<td style="text-align: left;">End users — full table of all Oromo ↔ Python keywords</td>
+</tr>
+<tr>
+<td style="text-align: left;">adding-a-language.md</td>
+<td style="text-align: left;">Adapter authors — step-by-step guide (Section 9 above)</td>
+</tr>
+<tr>
+<td style="text-align: left;">architecture.md</td>
+<td style="text-align: left;">Core contributors — pipeline, design decisions, ADRs</td>
+</tr>
+<tr>
+<td style="text-align: left;">api-reference.md</td>
+<td style="text-align: left;">Library users — auto-generated from docstrings via mkdocstrings</td>
+</tr>
+<tr>
+<td style="text-align: left;">contributing.md</td>
+<td style="text-align: left;">All contributors — workflow, code style, CLA</td>
+</tr>
+</tbody>
+</table>
+<h2 id="132-in-code-documentation"><strong>13.2 In-code documentation</strong></h2>
+<ul>
+<li>
+<p>Every public function/class has a Google-style docstring</p>
+</li>
+<li>
+<p>Every module has a module-level docstring explaining its role in the pipeline</p>
+</li>
+<li>
+<p>Architecture Decision Records (ADRs) live in docs/adr/ — one markdown file per decision</p>
+</li>
+<li>
+<p><strong>Example ADR:</strong> docs/adr/001-use-ast-unparse-as-codegen.md — explains why we use ast.unparse() instead of a custom code generator</p>
+</li>
+</ul>
+<h1 id="14-versioning-release"><strong>14. Versioning &amp; Release</strong></h1>
+<p>OromScript follows Semantic Versioning (SemVer 2.0). The Python package, VS Code extension, and keyword_map.json schema are versioned independently but co-released.</p>
+<h2 id="141-version-matrix"><strong>14.1 Version matrix</strong></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Version bump</th>
+<th style="text-align: left;">Trigger</th>
+<th style="text-align: left;">Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">PATCH (x.y.Z)</td>
+<td style="text-align: left;">Bug fix, docs, no API change</td>
+<td style="text-align: left;">Fix wrong keyword mapping</td>
+</tr>
+<tr>
+<td style="text-align: left;">MINOR (x.Y.0)</td>
+<td style="text-align: left;">New keyword, new feature, backward-compatible</td>
+<td style="text-align: left;">Add 10 new builtins</td>
+</tr>
+<tr>
+<td style="text-align: left;">MAJOR (X.0.0)</td>
+<td style="text-align: left;">Breaking change to public API or keyword_map schema</td>
+<td style="text-align: left;">Rename a keyword, schema v2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="142-release-steps-automated-via-releaseyml"><strong>14.2 Release steps (automated via release.yml)</strong></h2>
+<ol>
+<li>
+<p>Maintainer creates and pushes a tag: git tag v1.2.3 &amp;&amp; git push --tags</p>
+</li>
+<li>
+<p>release.yml triggers; builds wheel + sdist</p>
+</li>
+<li>
+<p>Publishes to PyPI via OIDC trusted publishing (no stored secrets)</p>
+</li>
+<li>
+<p>Builds VS Code .vsix and publishes to Marketplace</p>
+</li>
+<li>
+<p>Creates GitHub Release with auto-generated notes from CHANGELOG.md</p>
+</li>
+</ol>
+<h1 id="15-scalability-roadmap"><strong>15. Scalability Roadmap</strong></h1>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Version</th>
+<th style="text-align: left;">Theme</th>
+<th style="text-align: left;">Key additions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">v1.0</td>
+<td style="text-align: left;">Afan Oromo MVP</td>
+<td style="text-align: left;">Full Python 3 parity, CLI, library, VS Code extension, docs</td>
+</tr>
+<tr>
+<td style="text-align: left;">v1.x</td>
+<td style="text-align: left;">Community adapters</td>
+<td style="text-align: left;">Amharic, Tigrinya, Somali adapters contributed by community</td>
+</tr>
+<tr>
+<td style="text-align: left;">v2.0</td>
+<td style="text-align: left;">Source maps + REPL</td>
+<td style="text-align: left;">Full stack traces in Oromo, interactive REPL, DAP debugger support</td>
+</tr>
+<tr>
+<td style="text-align: left;">v2.x</td>
+<td style="text-align: left;">Synonym keywords</td>
+<td style="text-align: left;">Allow multiple Oromo spellings per Python keyword</td>
+</tr>
+<tr>
+<td style="text-align: left;">v3.0</td>
+<td style="text-align: left;">Multi-target IR</td>
+<td style="text-align: left;">Optional IR layer enabling transpilation to JS/TypeScript</td>
+</tr>
+</tbody>
+</table>
+<h1 id="16-security-considerations"><strong>16. Security Considerations</strong></h1>
+<ul>
+<li>
+<p><strong>No code execution during transpilation:</strong> the transpiler only parses and transforms ASTs — it never eval()s user code</p>
+</li>
+<li>
+<p><strong>Dependency minimisation:</strong> core library has zero runtime dependencies beyond Python stdlib — reduces supply chain attack surface</p>
+</li>
+<li>
+<p><strong>Sandboxed execution:</strong> oromscript run does not grant any additional permissions beyond what python itself would; the generated .py runs in a normal CPython process</p>
+</li>
+<li>
+<p><strong>JSON Schema validation:</strong> keyword_map.json is schema-validated before loading — prevents malformed adapter files from causing unexpected behaviour</p>
+</li>
+<li>
+<p><strong>No network access during transpile:</strong> the transpiler is fully offline; no telemetry, no update checks</p>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
