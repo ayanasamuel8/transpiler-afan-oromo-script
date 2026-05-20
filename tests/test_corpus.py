@@ -34,10 +34,10 @@ def test_corpus(lang: str, orm_path: Path, py_path: Path) -> None:
     source = orm_path.read_text(encoding="utf-8")
     expected = py_path.read_text(encoding="utf-8").strip()
     result = transpile(source, lang=lang).strip()
-    
+
     expected_ast = ast.dump(ast.parse(expected))
     result_ast = ast.dump(ast.parse(result))
-    
+
     assert result_ast == expected_ast, (
         f"\nAdapter: {lang}\nFile: {orm_path.name}\n"
         f"--- Expected ---\n{expected}\n"
