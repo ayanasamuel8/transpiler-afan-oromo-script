@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import pytest
@@ -8,8 +9,6 @@ from oromscript import transpile
 
 ADAPTERS_DIR = Path(__file__).parent.parent / "adapters"
 
-
-import ast
 
 def collect_corpus_cases():
     """Yield (lang, orm_path, py_path) for every corpus pair."""

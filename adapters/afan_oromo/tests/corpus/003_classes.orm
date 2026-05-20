@@ -4,7 +4,7 @@ gosa Barataa:
         of.umri = umri
 
     hojii of_ibsi(of):
-        agarsiisi(f'{of.maqaa}: {of.umri}')
+        agarsiisi(of.maqaa + ": " + barruu(of.umri))
 
 b = Barataa('Chaltu', 20)
 b.of_ibsi()
