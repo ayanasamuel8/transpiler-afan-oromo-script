@@ -1,7 +1,0 @@
-lakkoofsa1 = 8
-lakkoofsa2 = 4
-idaama = lakkoofsa1 + lakkoofsa2
-hirama = lakkoofsa1 / lakkoofsa2
-
-agarsiisi("Idaama =", idaama)
-agarsiisi("Hirama =", hirama)

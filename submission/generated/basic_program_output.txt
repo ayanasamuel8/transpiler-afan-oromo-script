@@ -1,2 +1,0 @@
-Idaama = 12
-Hirama = 2.0
