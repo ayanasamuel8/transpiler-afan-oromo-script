@@ -1,0 +1,18 @@
+hojii sadarkaa_kenni(marka):
+    yoo marka > 80:
+        deebi "A"
+    yookaan marka > 60:
+        deebi "B"
+    yoo_miti:
+        deebi "C"
+
+gosa Barataa:
+    hojii __init__(of, maqaa, marka):
+        of.maqaa = maqaa
+        of.marka = marka
+
+    hojii agarsiisi_gatii(of):
+        agarsiisi(of.maqaa + " => " + sadarkaa_kenni(of.marka))
+
+barataa = Barataa("Bontu", 75)
+barataa.agarsiisi_gatii()
