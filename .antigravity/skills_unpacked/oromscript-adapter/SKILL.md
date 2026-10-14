@@ -49,7 +49,7 @@ oromscript new-lang <lang_name>
 Or manually create the folder. The `new-lang` command generates:
 - `keyword_map.json` with all Python keywords listed and empty value strings.
 - `error_messages.json` with all error codes listed and empty strings.
-- `grammar_hooks.py` as a no-op stub.
+- `grammar_hooks.py` as a docstring-only module (no hook functions).
 - `tests/` directory.
 
 ### Step 2 — Fill keyword_map.json

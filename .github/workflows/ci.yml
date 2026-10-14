@@ -56,6 +56,10 @@ jobs:
           pytest tests/ adapters/*/tests/ -v --tb=short
           --cov=oromscript --cov-report=xml --cov-fail-under=95
 
+      - name: Compare the parser with the whole standard library
+        if: matrix.python-version == '3.12'
+        run: pytest tests/ -m slow -v --tb=short
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:

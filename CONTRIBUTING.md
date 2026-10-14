@@ -29,6 +29,9 @@ Using OromScript's plugin infrastructure, it's easy to add a new language. You p
 
 - We require **100%** of keywords in `keyword_map.json` to have at least one corpus test.
 - Every mapped error path should trigger properly in tests.
-- Core engine coverage requirement is ≥ 90%.
+- Core engine coverage requirement is ≥ 90% (CI requires 95%).
+- Changes to `oromscript/lexer.py` or `oromscript/parser.py` must keep the comparison tests with CPython passing (`tests/test_lexer.py`, `tests/test_parser.py`). Add a snippet to the `VALID` or `INVALID` list for every new case.
+- Run `make test-slow` to compare the parser with the whole Python standard library.
+- Run `make bench` before and after a change that could affect speed. `tests/test_memory.py` fails if a change makes memory or object counts grow.
 
 For more details on the architecture, see [docs/architecture.md](docs/architecture.md) and [docs/OromScript_Design_Specification.md](docs/OromScript_Design_Specification.md).

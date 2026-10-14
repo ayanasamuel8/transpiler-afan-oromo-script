@@ -41,7 +41,7 @@ class OrmLexError(OrmError):
 
 
 class OrmSyntaxError(OrmError):
-    """Raised when the translated source fails ast.parse()."""
+    """Raised when the program has a syntax error, or is nested too deeply."""
 
 
 class OrmNameError(OrmError):

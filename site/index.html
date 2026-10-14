@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -482,6 +482,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#getting-started" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -734,7 +756,7 @@
 <h1 id="oromscript">OromScript</h1>
 <p><em>Write Python in Afan Oromo — Execute Anywhere</em></p>
 <p>OromScript is an open-source, language-localisation transpiler platform that lets developers write Python programs using <strong>Afan Oromo</strong> keywords, identifiers, and idioms.</p>
-<p>The transpiler parses Oromo-syntax source files (<code>.orm</code>), translates them into standard Python 3.12+, and executes or outputs the result — with no measurable runtime overhead above Python itself.</p>
+<p>The transpiler parses Oromo-syntax source files (<code>.orm</code>), translates them into standard Python (3.10 or newer), and executes or outputs the result — with no measurable runtime overhead above Python itself.</p>
 <h2 id="core-value-proposition">Core Value Proposition</h2>
 <p>Lower the barrier to programming for the 40+ million Afan Oromo speakers worldwide. It also provides a reusable, well-documented platform so any other language community (Amharic, Tigrinya, Somali, etc.) can add their own keyword layer seamlessly. </p>
 <h2 id="features">Features</h2>
@@ -742,12 +764,25 @@
 <li><strong>Full Python Parity:</strong> Every Python 3 construct has an Afan Oromo equivalent.</li>
 <li><strong>Zero Runtime Overhead:</strong> Generated Python is fully identical to hand-written Python. CPython runs the output directly.</li>
 <li><strong>Language Plugin Architecture:</strong> Add a new language by simply supplying one JSON keyword map.</li>
+<li><strong>Hand-written Lexer and Parser:</strong> The lexer and the recursive descent parser are part of this project, not wrappers around Python's <code>tokenize</code> module. f-strings are parsed by the same code, including <code>=</code> debug fields, conversions and nested format specs. They keep the line and column of your original <code>.orm</code> source, so errors point at what you wrote.</li>
+<li><strong>Afan Oromo Aware:</strong> Words with a hudhaa, such as <code>walitti_ida'i</code>, work with a straight or curly apostrophe. Names inside f-strings are translated too. <code>oromscript.graphemes</code> knows the letters of Afan Oromo: digraphs (<code>dh</code>), long vowels (<code>aa</code>), doubled consonants (<code>bb</code>) and the hudhaa. The parser attaches these as <code>Grapheme</code> nodes to every name in the tree (<code>node.graphemes</code>), and <code>split_graphemes</code> / <code>grapheme_len</code> work on plain words.</li>
 <li><strong>VS Code Support:</strong> Syntax highlighting extension included.</li>
 </ul>
 <h2 id="examples">Examples</h2>
 <p>To view examples, check out the <code>examples/</code> directory containing concepts like loops, conditional statements, simple scripts, classes and <code>match</code>/<code>case</code> scenarios.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>oromscript<span class="w"> </span>run<span class="w"> </span>examples/hello_world.orm
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>oromscript<span class="w"> </span>run<span class="w"> </span>examples/fibonacci.orm
+</code></pre></div>
+<h2 id="quality">Quality</h2>
+<ul>
+<li>The lexer and parser are tested against CPython itself: same syntax tree, same node positions, and the same accept/reject decisions on hundreds of snippets and on the Python standard library.</li>
+<li>Memory tests run the whole pipeline many times and fail if memory or live object counts grow.</li>
+<li><code>python benchmarks/bench.py</code> reports time per stage, tokens per second, and memory growth. On a development laptop the lexer and parser handle about 230,000 to 330,000 tokens per second. The parse stage of a 1 MB file takes 0.25 to 0.45 seconds, and the whole transpile (with semantic analysis and code generation) about 1.2 to 1.3 seconds.</li>
+</ul>
+<h2 id="development">Development</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># run the tests</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make<span class="w"> </span>lint<span class="w">    </span><span class="c1"># ruff, black, mypy</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>make<span class="w"> </span>bench<span class="w">   </span><span class="c1"># run the benchmark</span>
 </code></pre></div>
 <h2 id="getting-started">Getting Started</h2>
 <p>See <a href="getting-started/">Getting Started</a>.</p>
@@ -807,7 +842,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

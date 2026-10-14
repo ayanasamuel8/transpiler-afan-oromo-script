@@ -22,7 +22,14 @@ Unit            tests/test_*.py             pytest          ≥ 90% line coverag
 Adapter unit    adapters/*/tests/test_*.py  pytest          100% keyword coverage
 Corpus (E2E)    adapters/*/tests/corpus/    pytest          every keyword category
 CLI integration tests/test_cli.py           pytest+subprocess  all commands
-Performance     benchmarks/bench.py         custom          transpile < 20 ms
+Differential     tests/test_lexer.py,        pytest          same tokens, trees and
+                tests/test_parser.py,                       positions as CPython
+                tests/test_fuzz.py,                         (and same accept/reject)
+                tests/test_fstrings.py,
+                tests/test_strings.py
+Memory          tests/test_memory.py        pytest+tracemalloc  no growth over many runs
+Performance     benchmarks/bench.py,        custom + pytest transpile < 100 ms / 1000 lines,
+                tests/test_performance.py                   >= 15,000 tokens/sec
 Schema          (run via validate-adapter)  jsonschema      all adapters
 Error paths     tests/test_errors.py        pytest          every error code
 ```
@@ -52,7 +59,7 @@ source = ["oromscript"]
 omit = ["oromscript/cli.py"]   # CLI tested via subprocess
 
 [tool.coverage.report]
-fail_under = 90
+fail_under = 90   # CI passes --cov-fail-under=95
 show_missing = true
 ```
 
@@ -92,7 +99,7 @@ def sample_py() -> str:
 
 ## Unit Tests
 
-### tests/test_lexer.py
+### tests/test_lexer.py (excerpt: the file also compares tokens with `tokenize`, and covers layout, positions, literals, translation, hudhaa, and f-strings)
 
 ```python
 from __future__ import annotations
@@ -145,7 +152,7 @@ def test_token_immutability(oromo_adapter):
     assert list(lexer._source) == tokens_before
 ```
 
-### tests/test_parser.py
+### tests/test_parser.py (excerpt: the file also holds the `VALID` and `INVALID` snippet lists that are compared with `ast.parse`, plus standard library checks)
 
 ```python
 import ast
@@ -328,70 +335,14 @@ def test_validate_adapter_passes_for_oromo():
 
 ## Performance Benchmarks
 
-```python
-# benchmarks/bench.py
-"""
-OromScript performance benchmark.
+See `benchmarks/bench.py`. It times `transpile` for 100, 1000 and about 35,000 lines (1 MB),
+times the lexer and parser separately, computes tokens per second, and measures bytes still held
+after 100 extra runs. `--ci` exits with 1 if any budget is missed.
 
-Usage:
-    python benchmarks/bench.py           # human-readable output
-    python benchmarks/bench.py --ci      # fail if any stage exceeds budget
-"""
-from __future__ import annotations
+Speed and memory are also checked in pytest, with wide limits that stay stable on slow machines:
 
-import argparse
-import time
-from pathlib import Path
-
-from oromscript import transpile
-
-BUDGET_MS = {
-    "transpile_small":  20,   # < 20 ms for a ~100 line file
-    "transpile_large":  100,  # < 100 ms for a ~1000 line file
-}
-
-SMALL = Path("examples/fibonacci.orm").read_text()
-LARGE = SMALL * 10   # synthetic 1000-line load
-
-
-def bench(name: str, fn, reps: int = 100) -> float:
-    """Return mean ms over `reps` repetitions."""
-    times = []
-    for _ in range(reps):
-        t0 = time.perf_counter()
-        fn()
-        times.append((time.perf_counter() - t0) * 1000)
-    mean = sum(times) / len(times)
-    return mean
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ci", action="store_true")
-    args = parser.parse_args()
-
-    results: dict[str, float] = {
-        "transpile_small": bench("small", lambda: transpile(SMALL)),
-        "transpile_large": bench("large", lambda: transpile(LARGE), reps=20),
-    }
-
-    print("\nOromScript Benchmark Results")
-    print("=" * 40)
-    failed = False
-    for name, ms in results.items():
-        budget = BUDGET_MS[name]
-        status = "✓" if ms <= budget else "✗"
-        print(f"  {status} {name:<25} {ms:6.2f} ms  (budget: {budget} ms)")
-        if ms > budget:
-            failed = True
-
-    if args.ci and failed:
-        raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main()
-```
+- `tests/test_performance.py` checks throughput, linear growth with file size, and that a very long line or an unterminated triple quote does not cause quadratic time.
+- `tests/test_memory.py` runs the pipeline many times under `tracemalloc` and fails if memory or live object counts grow. Count objects WITHOUT tracemalloc running, because tracemalloc keeps objects of its own.
 
 ---
 

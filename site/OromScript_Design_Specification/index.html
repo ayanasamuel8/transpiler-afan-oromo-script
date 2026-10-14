@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -641,7 +641,7 @@
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Scope boundaries (what this design covers) • Afan Oromo → Python 3.12+ full-language transpiler (all Python constructs) • A plugin/adapter system for adding new languages (Amharic, etc.) • CLI tool, library API, VS Code syntax highlighting extension • Comprehensive test suite, CI/CD pipeline, contribution workflow • Localized error messages in Oromo (and extensible for other languages) • NOT in scope for v1: JIT compilation, custom C-extension ABI, IDE debugger protocol</th>
+<th style="text-align: left;">Scope boundaries (what this design covers) • Afan Oromo → Python 3.10 or newer full-language transpiler (all Python constructs) • A plugin/adapter system for adding new languages (Amharic, etc.) • CLI tool, library API, VS Code syntax highlighting extension • Comprehensive test suite, CI/CD pipeline, contribution workflow • Localized error messages in Oromo (and extensible for other languages) • NOT in scope for v1: JIT compilation, custom C-extension ABI, IDE debugger protocol</th>
 </tr>
 </thead>
 <tbody>
@@ -715,7 +715,7 @@
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">┌──────────────────────────────────────────────────────────────────────┐   │                         OROMSCRIPT PIPELINE                          │   └──────────────────────────────────────────────────────────────────────┘                                                                               .orm source file                                                                │                                                                          ▼                                                                    ┌─────────────┐    keyword_map.json   ┌──────────────────────────────┐    │   LEXER     │◄─────────────────────│  Language Adapter (Oromo)    │    │  (Tokenizer)│                       │  • keyword_map.json          │    └─────────────┘                       │  • grammar_hooks.py (opt.)   │          │                               └──────────────────────────────┘          │ token stream                                                             ▼                                                                    ┌─────────────┐                                                           │   PARSER    │  (Python grammar extended with adapter hooks)              │  (LALR/PEG) │                                                           └─────────────┘                                                                 │                                                                          │ AST (language-neutral)                                                   ▼                                                                    ┌─────────────┐                                                           │  SEMANTIC   │  (symbol table, scope, type hints validation)              │  ANALYSER   │                                                           └─────────────┘                                                                 │                                                                          │ annotated AST                                                            ▼                                                                    ┌─────────────┐                                                           │  CODE GEN   │  ast.unparse() → standard Python source                   │  + SOURCEMAP│  produces .py + .orm.map (line/col mapping)               └─────────────┘                                                                 │                                                                          ├── output.py  (for --emit-python)                                        └──► CPython   (for --run)</th>
+<th style="text-align: left;">┌──────────────────────────────────────────────────────────────────────┐   │                         OROMSCRIPT PIPELINE                          │   └──────────────────────────────────────────────────────────────────────┘                                                                               .orm source file                                                                │                                                                          ▼                                                                    ┌─────────────┐    keyword_map.json   ┌──────────────────────────────┐    │   LEXER     │◄─────────────────────│  Language Adapter (Oromo)    │    │  (Tokenizer)│                       │  • keyword_map.json          │    └─────────────┘                       │  • grammar_hooks.py (opt.)   │          │                               └──────────────────────────────┘          │ token stream                                                             ▼                                                                    ┌─────────────┐                                                           │   PARSER    │  (Python grammar extended with adapter hooks)              │  (recursive descent) │                                                           └─────────────┘                                                                 │                                                                          │ AST (language-neutral)                                                   ▼                                                                    ┌─────────────┐                                                           │  SEMANTIC   │  (symbol table, scope, type hints validation)              │  ANALYSER   │                                                           └─────────────┘                                                                 │                                                                          │ annotated AST                                                            ▼                                                                    ┌─────────────┐                                                           │  CODE GEN   │  ast.unparse() → standard Python source                   │  + SOURCEMAP│  produces .py + .orm.map (line/col mapping)               └─────────────┘                                                                 │                                                                          ├── output.py  (for --emit-python)                                        └──► CPython   (for --run)</th>
 </tr>
 </thead>
 <tbody>
@@ -783,11 +783,18 @@
 </table>
 <h1 id="4-detailed-component-design"><strong>4. Detailed Component Design</strong></h1>
 <h2 id="41-lexer"><strong>4.1 Lexer</strong></h2>
-<p>The Lexer inherits from Python's own tokenize module. It intercepts the token stream and applies a reverse keyword map: any token whose string value matches a local-language keyword is replaced with the corresponding Python keyword token before the parser sees it. This means the parser is always working with standard Python tokens and requires no changes per language.</p>
+<p>The Lexer is hand-written. It reads the source with one compiled regular expression, tracks indentation itself, and applies a reverse keyword map: any name token whose text matches a local-language keyword or builtin is replaced with the corresponding Python name before the parser sees it. It emits standard <code>tokenize.TokenInfo</code> objects, so the parser always works with standard Python tokens and needs no changes per language.</p>
+<p>Beyond keyword translation, the Lexer:</p>
+<ul>
+<li>keeps the line and column of the original <code>.orm</code> text on every token, so errors point at what the user wrote</li>
+<li>translates names inside the <code>{...}</code> fields of f-strings, and leaves literal text and format specifications alone</li>
+<li>matches keywords that contain a hudhaa (apostrophe), such as <code>walitti_ida'i</code>, and accepts the curly apostrophes <code>’</code>, <code>ʼ</code> and <code>‘</code> for them (see <code>oromscript/graphemes.py</code>)</li>
+<li>raises <code>OrmLexError</code> (code <code>E0001</code>) for an unterminated string, an invalid character, an unclosed bracket, or inconsistent indentation</li>
+</ul>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;"># oromscript/lexer.py (simplified) import tokenize, io from .adapter import AdapterRegistry class OromLexer:     def __init__(self, source: str, lang: str \= 'afan_oromo'):         self.adapter \= AdapterRegistry.get(lang)         self.source \= source     def tokenize(self):         tokens \= list(tokenize.generate_tokens(             io.StringIO(self.source).readline         ))         return [self._translate(tok) for tok in tokens]     def _translate(self, tok):         if tok.type \== tokenize.NAME:             py_kw \= self.adapter.to_python_keyword(tok.string)             if py_kw:                 return tok._replace(string=py_kw)         return tok</th>
+<th style="text-align: left;"># oromscript/lexer.py (simplified) class OrmLexer:     def __init__(self, source, adapter):         self._combined_map \= {local: python for python, local in adapter.maps()}         self._scanner \= _build_scanner(adapter)  # one compiled regex     def tokenize(self):         tokens \= []         while pos \&lt; len(source):             match \= self._scanner.match(source, pos)             # string, number, name, operator, comment, newline ...             # INDENT/DEDENT are emitted at the start of each logical line             if match.lastgroup \== "name":                 text \= self._combined_map.get(text, text)             tokens.append(TokenInfo(...))         return tokens</th>
 </tr>
 </thead>
 <tbody>
@@ -797,7 +804,9 @@
 </tbody>
 </table>
 <h2 id="42-parser"><strong>4.2 Parser</strong></h2>
-<p>The parser uses <strong>Python's built-in</strong> ast.parse() on the translated token stream (re-assembled into a string via tokenize.untokenize()). This keeps the parser zero-maintenance — as CPython evolves, our parser evolves for free. Grammar hooks in the adapter can pre-process the source string before re-assembly for languages with structural differences (e.g. postfix function calls).</p>
+<p>The parser is a hand-written recursive descent parser. It reads the translated token list and builds a standard Python <code>ast</code> tree directly, with line and column numbers on every node. f-strings are cut into text and fields by <code>oromscript/fstrings.py</code> and each field is read by the same parser. The parser also attaches <code>Grapheme</code> nodes (the digraphs, long vowels, doubled consonants and hudhaa of each name) to every name node as <code>node.graphemes</code>; they are not part of <code>_fields</code>, so Python's tools and <code>compile</code> ignore them. Expressions use precedence climbing. Each statement kind has its own method. <code>match</code> and <code>case</code> are soft keywords, so the parser tries a <code>match</code> statement first and falls back to a normal name.</p>
+<p>Because the output is a standard Python AST, the semantic analyser and <code>ast.unparse()</code> work unchanged. The parser is tested against CPython's own <code>ast.parse</code> (same tree, same positions, same accept/reject decisions) on hundreds of snippets and on the Python standard library.</p>
+<p>Grammar hooks in the adapter can pre-process the source string for languages with structural differences (e.g. postfix function calls). A hook receives the translated source text. If it changes the text, that text is parsed with Python's <code>ast.parse</code>. If it returns the text unchanged, the hand-written parser is used.</p>
 <h2 id="43-semantic-analyser"><strong>4.3 Semantic Analyser</strong></h2>
 <p>The semantic analyser performs a single-pass walk of the AST to:</p>
 <ul>
@@ -974,7 +983,7 @@
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">transpiler-afan-oromo-script/ ├── .github/ │   ├── workflows/ │   │   ├── ci.yml              # lint + test on every PR │   │   ├── release.yml         # tag → PyPI publish │   │   └── docs.yml            # build &amp; deploy docs site │   ├── ISSUE_TEMPLATE/ │   │   ├── bug_report.md │   │   ├── keyword_request.md  # request a new Oromo keyword │   │   └── new_language.md     # request a new language adapter │   ├── PULL_REQUEST_TEMPLATE.md │   └── CODEOWNERS │ ├── adapters/                   # Language adapter plugins │   └── afan_oromo/ │       ├── keyword_map.json │       ├── grammar_hooks.py │       ├── error_messages.json │       └── tests/ │           ├── test_keywords.py │           └── corpus/         # .orm + expected .py pairs │ ├── oromscript/                 # Core library │   ├── __init__.py │   ├── lexer.py │   ├── parser.py │   ├── semantic.py │   ├── codegen.py │   ├── sourcemap.py │   ├── errors.py │   ├── adapter.py              # AdapterRegistry │   └── cli.py                  # Click CLI entry point │ ├── tests/                      # Core engine tests │   ├── test_lexer.py │   ├── test_parser.py │   ├── test_codegen.py │   ├── test_cli.py │   └── test_performance.py     # benchmark vs raw Python │ ├── schemas/ │   └── keyword_map/ │       └── v1.json             # JSON Schema for keyword_map.json │ ├── vscode-extension/           # VS Code syntax highlighting │   ├── package.json │   ├── syntaxes/ │   │   └── afan_oromo.tmLanguage.json │   └── README.md │ ├── docs/ │   ├── index.md │   ├── getting-started.md │   ├── keyword-reference.md │   ├── adding-a-language.md    # step-by-step guide │   ├── architecture.md │   ├── api-reference.md │   └── contributing.md │ ├── examples/ │   ├── hello_world.orm │   ├── fibonacci.orm │   ├── classes.orm │   └── web_scraper.orm         # real-world example │ ├── benchmarks/ │   └── bench.py                # transpile-time + runtime benchmarks │ ├── CHANGELOG.md ├── CONTRIBUTING.md ├── CODE_OF_CONDUCT.md ├── LICENSE                     # MIT ├── README.md ├── pyproject.toml              # PEP 517/518 build config └── Makefile                    # dev shortcuts</th>
+<th style="text-align: left;">transpiler-afan-oromo-script/ ├── .github/ │   ├── workflows/ │   │   ├── ci.yml              # lint + test on every PR │   │   ├── release.yml         # tag → PyPI publish │   │   └── docs.yml            # build &amp; deploy docs site │   ├── ISSUE_TEMPLATE/ │   │   ├── bug_report.md │   │   ├── keyword_request.md  # request a new Oromo keyword │   │   └── new_language.md     # request a new language adapter │   ├── PULL_REQUEST_TEMPLATE.md │   └── CODEOWNERS │ ├── adapters/                   # Language adapter plugins │   └── afan_oromo/ │       ├── keyword_map.json │       ├── grammar_hooks.py │       ├── error_messages.json │       └── tests/ │           ├── test_keywords.py │           └── corpus/         # .orm + expected .py pairs │ ├── oromscript/                 # Core library │   ├── __init__.py │   ├── lexer.py │   ├── parser.py │   ├── graphemes.py            # Afan Oromo letter helpers │   ├── semantic.py │   ├── codegen.py │   ├── sourcemap.py │   ├── errors.py │   ├── adapter.py              # AdapterRegistry │   └── cli.py                  # Click CLI entry point │ ├── tests/                      # Core engine tests │   ├── test_lexer.py │   ├── test_parser.py │   ├── test_graphemes.py │   ├── test_pipeline.py │   ├── test_memory.py │   ├── test_codegen.py │   ├── test_cli.py │   └── test_performance.py     # benchmark vs raw Python │ ├── schemas/ │   └── keyword_map/ │       └── v1.json             # JSON Schema for keyword_map.json │ ├── vscode-extension/           # VS Code syntax highlighting │   ├── package.json │   ├── syntaxes/ │   │   └── afan_oromo.tmLanguage.json │   └── README.md │ ├── docs/ │   ├── index.md │   ├── getting-started.md │   ├── keyword-reference.md │   ├── adding-a-language.md    # step-by-step guide │   ├── architecture.md │   ├── api-reference.md │   └── contributing.md │ ├── examples/ │   ├── hello_world.orm │   ├── fibonacci.orm │   ├── classes.orm │   └── web_scraper.orm         # real-world example │ ├── benchmarks/ │   └── bench.py                # transpile-time + runtime benchmarks │ ├── CHANGELOG.md ├── CONTRIBUTING.md ├── CODE_OF_CONDUCT.md ├── LICENSE                     # MIT ├── README.md ├── pyproject.toml              # PEP 517/518 build config └── Makefile                    # dev shortcuts</th>
 </tr>
 </thead>
 <tbody>
@@ -991,37 +1000,38 @@
 <tr>
 <th style="text-align: left;">Operation</th>
 <th style="text-align: left;">Method</th>
-<th style="text-align: left;">Target latency</th>
+<th style="text-align: left;">Measured, 1000-line file</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;">Tokenise 1000-line file</td>
-<td style="text-align: left;">Python tokenize (C extension)</td>
-<td style="text-align: left;">\&lt; 5 ms</td>
-</tr>
-<tr>
-<td style="text-align: left;">Keyword translation</td>
-<td style="text-align: left;">O(1) dict lookup per token</td>
-<td style="text-align: left;">\&lt; 1 ms</td>
+<td style="text-align: left;">Tokenise + keyword translation</td>
+<td style="text-align: left;">Hand-written regex lexer, O(1) dict lookup per name</td>
+<td style="text-align: left;">about 7 ms</td>
 </tr>
 <tr>
 <td style="text-align: left;">Parse</td>
-<td style="text-align: left;">ast.parse() (CPython C)</td>
-<td style="text-align: left;">\&lt; 10 ms</td>
+<td style="text-align: left;">Hand-written recursive descent parser</td>
+<td style="text-align: left;">about 7 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;">Semantic analysis</td>
+<td style="text-align: left;">AST visitor</td>
+<td style="text-align: left;">about 2 ms</td>
 </tr>
 <tr>
 <td style="text-align: left;">Code gen</td>
-<td style="text-align: left;">ast.unparse() (CPython C)</td>
-<td style="text-align: left;">\&lt; 2 ms</td>
+<td style="text-align: left;">ast.unparse() (CPython)</td>
+<td style="text-align: left;">about 13 ms</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Total transpile</strong></td>
 <td style="text-align: left;"><strong>—</strong></td>
-<td style="text-align: left;"><strong>\&lt; 20 ms for any file</strong></td>
+<td style="text-align: left;"><strong>about 30 ms (budget: 100 ms)</strong></td>
 </tr>
 </tbody>
 </table>
+<p>These are measured on a development laptop with Python 3.14 (5,000 tokens). A 1 MB file (175,000 tokens) transpiles in about 1.2 to 1.3 seconds. The lexer and parser together handle 230,000 to 330,000 tokens per second, and the parse stage of a 1 MB file takes 0.25 to 0.45 seconds. <code>python benchmarks/bench.py --ci</code> fails if a budget is missed or if throughput falls below 15,000 tokens per second.</p>
 <h2 id="82-runtime-performance"><strong>8.2 Runtime Performance</strong></h2>
 <ul>
 <li>
@@ -1035,11 +1045,11 @@
 </li>
 </ul>
 <h2 id="83-future-c-extension-option"><strong>8.3 Future: C Extension Option</strong></h2>
-<p>If transpilation speed ever becomes a bottleneck (e.g. transpiling thousands of files in a CI build), the lexer loop can be re-implemented as a C extension using CPython's C API. The interface is already designed with this in mind: OromLexer exposes a single tokenize() method whose return type would not change.</p>
+<p>If transpilation speed ever becomes a bottleneck (e.g. transpiling thousands of files in a CI build), the lexer and parser can be re-implemented as a C extension using CPython's C API. The interface is already designed with this in mind: OromLexer exposes a single tokenize() method and OrmParser a single parse() method, and their return types would not change.</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Guideline Do not pre-optimise. Measure first with benchmarks/bench.py. The pure-Python implementation is the v1 baseline; a C extension is a v2 option only if benchmarks show a real bottleneck.</th>
+<th style="text-align: left;">Guideline Do not pre-optimise. Measure first with benchmarks/bench.py. The pure-Python lexer and parser are the v1 baseline; a C extension is a v2 option only if benchmarks show a real bottleneck.</th>
 </tr>
 </thead>
 <tbody>
@@ -1173,8 +1183,18 @@
 <tbody>
 <tr>
 <td style="text-align: left;">Unit</td>
-<td style="text-align: left;">Lexer token translation, adapter loading, error formatting</td>
+<td style="text-align: left;">Lexer tokens and positions, parser trees, graphemes, adapter loading, error formatting</td>
 <td style="text-align: left;">pytest</td>
+</tr>
+<tr>
+<td style="text-align: left;">Differential</td>
+<td style="text-align: left;">Lexer and parser agree with CPython's <code>tokenize</code> and <code>ast.parse</code> (trees, positions, accept/reject)</td>
+<td style="text-align: left;">pytest</td>
+</tr>
+<tr>
+<td style="text-align: left;">Memory</td>
+<td style="text-align: left;">Repeated runs do not grow memory or object counts</td>
+<td style="text-align: left;">pytest + tracemalloc</td>
 </tr>
 <tr>
 <td style="text-align: left;">Integration</td>
@@ -1188,8 +1208,8 @@
 </tr>
 <tr>
 <td style="text-align: left;">Performance</td>
-<td style="text-align: left;">Transpile time \&lt; 20 ms; generated .py runs at native speed</td>
-<td style="text-align: left;">benchmarks/bench.py</td>
+<td style="text-align: left;">Transpile time within budget; throughput of at least 15,000 tokens/sec; time grows linearly</td>
+<td style="text-align: left;">pytest + benchmarks/bench.py</td>
 </tr>
 <tr>
 <td style="text-align: left;">Schema</td>
@@ -1510,7 +1530,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

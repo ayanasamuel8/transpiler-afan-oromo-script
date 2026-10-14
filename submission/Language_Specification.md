@@ -168,11 +168,11 @@ The translator is implemented as a real parsing pipeline, not simple text replac
 
 ### 6.1 Lexer
 
-The lexer uses Python’s Unicode-aware tokenizer. It reads `.orm` source as UTF-8 and replaces recognized Afan Oromo identifiers such as `yoo` or `agarsiisi` with their Python equivalents while preserving the program structure.
+The lexer is hand-written and Unicode-aware. It reads `.orm` source as UTF-8, tracks indentation itself, and replaces recognized Afan Oromo identifiers such as `yoo` or `agarsiisi` with their Python equivalents while preserving the program structure. It also accepts keywords that contain a hudhaa (apostrophe), such as `walitti_ida'i`, typed with a straight or curly apostrophe, and it translates names inside f-string fields. Every token keeps its line and column in the original `.orm` file.
 
 ### 6.2 Parser
 
-After keyword translation, the parser reconstructs the source and builds a Python AST using `ast.parse()`. This guarantees that the translated program follows real Python syntax rules.
+After keyword translation, a hand-written recursive descent parser builds a standard Python AST directly from the tokens. It is tested against Python’s own `ast.parse()` (same tree, same node positions, and the same accept/reject decisions), so the translated program follows real Python syntax rules. f-strings are read by the same parser. Every name in the tree also carries Afan Oromo `Grapheme` nodes (digraphs such as `dh`, long vowels such as `aa`, doubled consonants such as `bb`, and the hudhaa), which Python’s tools and `compile()` ignore.
 
 ### 6.3 Semantic pass
 

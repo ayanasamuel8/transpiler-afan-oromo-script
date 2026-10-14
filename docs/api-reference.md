@@ -14,6 +14,9 @@ This page contains the automatically generated API documentation for the interna
 ## Parser
 ::: oromscript.parser
 
+## Graphemes
+::: oromscript.graphemes
+
 ## Semantic Analyser
 ::: oromscript.semantic
 

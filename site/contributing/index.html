@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -728,7 +728,10 @@
 <ul>
 <li>We require <strong>100%</strong> of keywords in <code>keyword_map.json</code> to have at least one corpus test.</li>
 <li>Every mapped error path should trigger properly in tests.</li>
-<li>Core engine coverage requirement is ≥ 90%.</li>
+<li>Core engine coverage requirement is ≥ 90% (CI requires 95%).</li>
+<li>Changes to <code>oromscript/lexer.py</code> or <code>oromscript/parser.py</code> must keep the comparison tests with CPython passing (<code>tests/test_lexer.py</code>, <code>tests/test_parser.py</code>). Add a snippet to the <code>VALID</code> or <code>INVALID</code> list for every new case.</li>
+<li>Run <code>make test-slow</code> to compare the parser with the whole Python standard library.</li>
+<li>Run <code>make bench</code> before and after a change that could affect speed. <code>tests/test_memory.py</code> fails if a change makes memory or object counts grow.</li>
 </ul>
 <p>For more details on the architecture, see <a href="../architecture/">Architecture</a> and <a href="../OromScript_Design_Specification/">Design Specification</a>.</p>
 
@@ -783,7 +786,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

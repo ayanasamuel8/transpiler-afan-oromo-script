@@ -8,147 +8,93 @@ without updating this file and opening a design ADR.
 
 ## oromscript/lexer.py
 
+The lexer is about 600 lines, so only its structure is shown here. Read `oromscript/lexer.py` for the code.
+
 ```python
-"""
-oromscript.lexer
-~~~~~~~~~~~~~~~~
-Tokenises Afan Oromo (or any localised) Python source and translates
-language-specific keywords/builtins into their Python equivalents.
-
-This is the first stage of the OromScript transpile pipeline.
-"""
-from __future__ import annotations
-
-import io
-import tokenize
-from typing import TYPE_CHECKING
-
-from .errors import OrmLexError
-
-if TYPE_CHECKING:
-    from .adapter import Adapter
-
-
 class OrmLexer:
-    """Tokenise a localised source string and translate it to Python tokens.
+    def __init__(self, source: str, adapter: Adapter) -> None:
+        # builds self._combined_map (local name -> python name, hudhaa normalised)
+        # and self._scanner = _build_scanner(<keys that contain a hudhaa>)
+    def tokenize(self) -> list[tokenize.TokenInfo]: ...      # public
+    def _handle_indent(...) -> tuple[int, int, int, bool]    # INDENT/DEDENT, blank lines
+    def _finish(...) -> list[tokenize.TokenInfo]             # NEWLINE, DEDENTs, ENDMARKER
+    def _scan_fstring(...) -> tuple[int, str]                # f-string with translated fields
+    def _scan_field / _scan_word / _skip_plain_string        # f-string helpers
 
-    Args:
-        source: Raw source text in the target local language.
-        adapter: The loaded Adapter for the active language.
-
-    Example::
-
-        lexer = OrmLexer(source, adapter)
-        tokens = lexer.tokenize()
-    """
-
-    def __init__(self, source: str, adapter: "Adapter") -> None:
-        self._source = source
-        self._adapter = adapter
-        # Merge keyword + builtin maps once at init — O(1) lookup in hot path
-        self._combined_map: dict[str, str] = {
-            **adapter.keyword_map,
-            **adapter.builtin_map,
-        }
-
-    def tokenize(self) -> list[tokenize.TokenInfo]:
-        """Tokenise the source and return a translated token list.
-
-        Returns:
-            List of TokenInfo where local-language NAME tokens have been
-            replaced with their Python equivalents.
-
-        Raises:
-            OrmLexError: If the source cannot be tokenised.
-        """
-        try:
-            raw = list(
-                tokenize.generate_tokens(io.StringIO(self._source).readline)
-            )
-        except tokenize.TokenizeError as exc:
-            raise OrmLexError(
-                code="E0001",
-                message=str(exc),
-                orm_line=getattr(exc, "lineno", 0),
-                orm_col=getattr(exc, "offset", 0),
-                lang=self._adapter.lang,
-            ) from exc
-        return [self._translate(tok) for tok in raw]
-
-    def _translate(self, tok: tokenize.TokenInfo) -> tokenize.TokenInfo:
-        """Translate a single token if it is a known local-language name."""
-        if tok.type == tokenize.NAME:
-            py_equiv = self._combined_map.get(tok.string)
-            if py_equiv:
-                return tok._replace(string=py_equiv)
-        return tok
+@functools.lru_cache(maxsize=32)
+def _build_scanner(apostrophe_words: tuple[str, ...]) -> re.Pattern[str]: ...
 ```
+
+Master pattern groups, in order: `ws`, `comment`, `newline`, `cont`, `string`, `number`, `hudhaa`, `name`, `op`.
 
 ---
 
 ## oromscript/parser.py
 
+The parser is about 1,600 lines, so only its structure is shown here. Read `oromscript/parser.py` for the code.
+
 ```python
-"""
-oromscript.parser
-~~~~~~~~~~~~~~~~~
-Reconstructs Python source from translated tokens and parses it into an AST.
-
-This is the second stage of the OromScript transpile pipeline.
-"""
-from __future__ import annotations
-
-import ast
-import tokenize
-from typing import TYPE_CHECKING
-
-from .errors import OrmSyntaxError
-
-if TYPE_CHECKING:
-    from .adapter import Adapter
-
+class _Parser:
+    # token helpers: _advance, _peek, _is_op, _is_kw, _accept_*, _expect_*, _error, _at
+    def parse_module(self) -> ast.Module
+    # statements: _statement, _block, _simple_stmts, _simple_stmt, _expr_or_assign,
+    #   _if_stmt, _while_stmt, _for_stmt, _try_stmt, _with_stmt, _funcdef, _classdef,
+    #   _decorated, _async_stmt, _import_stmt, _from_stmt, _del_stmt, _raise_stmt
+    # match: _try_match_stmt (with backtracking), _patterns, _closed_pattern, ...
+    # 3.12+: _type_params, _type_alias
+    # f-strings: _fstring, _fstring_expression (calls fstrings.build_joined_str)
+    # expressions: _star_expressions, _named_expression, _expression, _disjunction,
+    #   _conjunction, _inversion, _comparison, _binary (precedence climbing),
+    #   _unary, _power, _primary, _atom, _strings, _fstring, comprehensions
 
 class OrmParser:
-    """Parse a translated token stream into a Python AST.
+    def __init__(self, adapter: Adapter) -> None: ...
+    def parse(self, tokens: list[tokenize.TokenInfo]) -> ast.AST: ...
+```
 
-    Args:
-        adapter: The loaded Adapter for the active language.
-    """
+---
 
-    def __init__(self, adapter: "Adapter") -> None:
-        self._adapter = adapter
+## oromscript/fstrings.py
 
-    def parse(self, tokens: list[tokenize.TokenInfo]) -> ast.AST:
-        """Convert tokens to AST.
+```python
+class FStringError(ValueError): ...
+def build_joined_str(tokens: list[tuple[str, int]], parse_expression) -> ast.JoinedStr: ...
+class _Scanner:  # text_and_fields, field, expression_end, is_debug_marker, ...
+```
 
-        Args:
-            tokens: Translated token list from OrmLexer.tokenize().
+---
 
-        Returns:
-            A valid Python AST.
+## oromscript/strings.py
 
-        Raises:
-            OrmSyntaxError: If the source has a syntax error.
-        """
-        source = tokenize.untokenize(tokens)
+```python
+def split_literal(text: str) -> tuple[str, str]: ...      # prefix, body
+def decode_string_literal(text: str, lineno: int) -> str | bytes: ...
+```
 
-        # Apply grammar hooks if the adapter supplies them
-        if self._adapter.grammar_hooks is not None:
-            hook = getattr(self._adapter.grammar_hooks, "pre_parse", None)
-            if hook is not None:
-                source = hook(source)
+---
 
-        try:
-            return ast.parse(source, filename="<orm>", type_comments=False)
-        except SyntaxError as exc:
-            raise OrmSyntaxError(
-                code="E0010",
-                message=exc.msg,
-                orm_line=exc.lineno or 0,
-                orm_col=exc.offset or 0,
-                lang=self._adapter.lang,
-                context={"text": exc.text or ""},
-            ) from exc
+## oromscript/_gc.py
+
+```python
+@contextlib.contextmanager
+def gc_paused() -> Iterator[None]: ...   # cycle collector off inside the block
+```
+
+---
+
+## oromscript/graphemes.py
+
+```python
+HUDHAA = "'"
+HUDHAA_VARIANTS = "'\u2019\u02bc\u2018"
+
+class Grapheme(ast.AST):  # _fields = ("text", "kind", "start", "end")
+    is_multi_character: bool
+def normalize_hudhaa(text: str) -> str: ...
+def grapheme_nodes(word: str) -> tuple[Grapheme, ...]: ...   # cached
+def iter_graphemes(tree: ast.AST) -> Iterator[tuple[ast.AST, tuple[Grapheme, ...]]]: ...
+def split_graphemes(word: str) -> list[str]: ...
+def grapheme_len(word: str) -> int: ...
 ```
 
 ---
@@ -472,6 +418,7 @@ from pathlib import Path
 
 from .adapter import AdapterRegistry
 from .codegen import CodeGen
+from .graphemes import grapheme_len, split_graphemes
 from .lexer import OrmLexer
 from .parser import OrmParser
 from .semantic import SemanticAnalyser

@@ -113,7 +113,8 @@ def scaffold_adapter(lang_name: str, adapters_dir: Path) -> None:
     )
 
     (d / "grammar_hooks.py").write_text(
-        "def pre_parse(source: str) -> str:\n    return source\n", encoding="utf-8"
+        '"""Optional grammar hooks. Define pre_parse(source) only to change text."""\n',
+        encoding="utf-8",
     )
 
     (d / "tests").mkdir(exist_ok=True)
