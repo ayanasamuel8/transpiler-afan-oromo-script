@@ -1,16 +1,16 @@
 """
 Grammar hooks for the Afan Oromo adapter.
-All functions are optional. The core engine checks for their existence before calling.
+
+The Afan Oromo adapter needs no hooks, so none is defined. The core engine
+checks for each hook before calling it.
+
+If a language needs one, define it in this file, for example::
+
+    def pre_parse(source: str) -> str:
+        # Change the source text after keyword translation. Return valid
+        # Python. The parser then reads that text with Python's own ast.parse().
+        return source.replace("...", "...")
+
+Define a hook only if it changes something. Any hook makes the engine rebuild
+the whole source text on every run, which takes about 8% of the parse time.
 """
-
-
-def pre_parse(source: str) -> str:
-    """Pre-process the untokenised Python source before ast.parse().
-
-    Args:
-        source: The source string after keyword translation.
-
-    Returns:
-        Modified source string. Must still be valid Python after modification.
-    """
-    return source

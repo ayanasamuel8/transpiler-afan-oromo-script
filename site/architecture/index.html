@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -454,6 +454,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -470,6 +488,97 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#lexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lexer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parser
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphemes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graphemes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Graphemes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grapheme-nodes-in-the-syntax-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grapheme nodes in the syntax tree
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -633,12 +742,131 @@
 <h1 id="architecture">Architecture</h1>
 <p>The OromScript transpiler pipeline is designed to be fully standard-compliant with modern Python, meaning its output is standard Python code. The pipeline consists of the following core stages:</p>
 <ol>
-<li><strong>Lexer</strong> (<code>oromscript.lexer</code>): Tokenizes the local language source code and maps keywords (e.g., <code>hojii</code> -&gt; <code>def</code>).</li>
-<li><strong>Parser</strong> (<code>oromscript.parser</code>): Transforms the token stream into a Python Abstract Syntax Tree (AST).</li>
+<li><strong>Lexer</strong> (<code>oromscript.lexer</code>): A hand-written lexer. It splits the source into tokens, tracks indentation, and replaces local-language names with Python names (e.g., <code>hojii</code> -&gt; <code>def</code>).</li>
+<li><strong>Parser</strong> (<code>oromscript.parser</code>): A hand-written recursive descent parser. It turns the token stream into a standard Python Abstract Syntax Tree (AST).</li>
 <li><strong>Semantic Analysis</strong> (<code>oromscript.semantic</code>): Validates the AST and prepares source-map information.</li>
 <li><strong>Code Generation</strong> (<code>oromscript.codegen</code>): Traverses the AST to reconstruct perfectly formatted Python source code using <code>ast.unparse</code>.</li>
 </ol>
+<p>A fifth module, <code>oromscript.graphemes</code>, holds helpers for Afan Oromo letters. The lexer uses it to accept every kind of apostrophe.</p>
 <p>For a full breakdown of the system design, read the <a href="../OromScript_Design_Specification/">OromScript Design Specification</a>.</p>
+<h2 id="lexer">Lexer</h2>
+<p>The lexer reads the whole source with one compiled regular expression. It does not use Python's <code>tokenize</code> module. It produces standard <code>tokenize.TokenInfo</code> objects, so other tools can read its output.</p>
+<p>What it does:</p>
+<ul>
+<li><strong>Tokens.</strong> Names, numbers (hex, octal, binary, floats, imaginary, underscores), strings (all prefixes, triple quotes, escapes), operators, and comments.</li>
+<li><strong>Layout.</strong> It emits <code>NEWLINE</code>, <code>INDENT</code>, and <code>DEDENT</code> tokens. A tab counts as up to the next multiple of 8 columns. Blank lines and comment-only lines do not change indentation. Newlines inside brackets and after a backslash do not end a statement.</li>
+<li><strong>Translation.</strong> A name found in the adapter's keyword or builtin map is replaced by the Python name. Names inside strings and comments are never changed.</li>
+<li><strong>Positions.</strong> Each token keeps its line and column in the original <code>.orm</code> source, even after translation. Errors point at the original text.</li>
+<li><strong>f-strings.</strong> Names inside the <code>{...}</code> fields of an f-string are translated. Text outside the fields and the format specifications are left alone. Strings that reuse the outer quote inside a field (Python 3.12 style) work.</li>
+<li><strong>Hudhaa.</strong> Some Afan Oromo words contain an apostrophe, such as <code>walitti_ida'i</code>. The lexer matches these words and also accepts the curly apostrophes <code>’</code>, <code>ʼ</code>, and <code>‘</code>, because many keyboards produce them.</li>
+<li><strong>Identifiers.</strong> Names that are not plain ASCII are normalised to NFKC form, as Python does. A character that cannot be in a name is an error.</li>
+<li><strong>Byte order mark.</strong> A leading byte order mark (<code>U+FEFF</code>) is ignored. Python's <code>ast.parse</code> rejects it in text, but editors on Windows often add it to UTF-8 files.</li>
+<li><strong>Differences from <code>tokenize</code>.</strong> The tokens equal <code>tokenize</code> for ordinary Python, with these exceptions: <code>\r\n</code> and lone <code>\r</code> become <code>\n</code>, a leading byte order mark is dropped, non-ASCII names are NFKC-normalised, f-strings are one <code>STRING</code> token (as <code>tokenize</code> does before Python 3.12), and an invalid number such as <code>0x</code> or <code>1__0</code> is split into separate tokens that the parser then rejects.</li>
+<li><strong>Errors.</strong> Problems raise <code>OrmLexError</code> with code <code>E0001</code>: an unterminated string (an unterminated <code>"""</code> is never read as an empty string), a character that is not valid, a NUL byte anywhere, an unclosed bracket (the message names the bracket and points at it), an indentation level that matches no outer level, mixed tabs and spaces that Python would reject, and a backslash at the very end of the file.</li>
+</ul>
+<p>Line and column numbers in lexer and parser errors both start at 1.</p>
+<p>The lexer follows the rules of CPython's own tokenizer, including odd ones: a backslash inside the indentation fixes the indentation level, and a backslash followed by spaces at the end of the file is accepted.</p>
+<h2 id="parser">Parser</h2>
+<p>The parser is a recursive descent parser. Each grammar rule is one method. Binary operators use precedence climbing, which keeps the number of calls per expression small.</p>
+<ul>
+<li>It covers the Python grammar of the Python version that runs it: all statements, expressions, comprehensions, lambdas, decorators, <code>async</code>, <code>match</code> statements with every pattern kind, parenthesised <code>with</code> items, and, where that Python allows them, <code>except*</code>, starred subscripts, type parameters and <code>type</code> aliases. Newer syntax is rejected on older Python, as <code>ast.parse</code> does.</li>
+<li><code>match</code> and <code>case</code> are soft keywords. The parser tries a <code>match</code> statement first and falls back to treating <code>match</code> as a normal name, so <code>match = 1</code> still works.</li>
+<li>Every node gets <code>lineno</code>, <code>col_offset</code>, <code>end_lineno</code>, and <code>end_col_offset</code>, set from the tokens. Columns count characters, not UTF-8 bytes.</li>
+<li><strong>f-strings</strong> are cut into text and fields by <code>oromscript.fstrings</code>. Each field expression is read by the same lexer and parser. The result follows CPython's rules for the Python version that runs it: from 3.12 a field may hold the outer quote, backslashes, comments and newlines, and format specs may nest one level deeper. Every node inside an f-string carries the position of the whole string.</li>
+<li>Plain string literals are decoded by <code>oromscript.strings</code>, not by <code>ast.literal_eval</code>. A bad escape such as <code>"\d"</code> gives a warning that names the <code>.orm</code> line, and no global warning filter is changed, so it is safe to use from threads.</li>
+<li><strong>Speed.</strong> The parser reuses one object for each context and operator (as CPython does), skips the <code>or</code>, <code>and</code> and comparison levels for simple operands, and pauses Python's cycle collector while it builds the tree (<code>oromscript._gc</code>).</li>
+<li>Code nested too deeply for the Python stack (about 70 levels of brackets, depending on the call stack) raises <code>OrmSyntaxError</code> instead of <code>RecursionError</code>.</li>
+<li>Errors raise <code>OrmSyntaxError</code> with code <code>E0010</code>, the line, the column, and the source text of the line.</li>
+<li>If an adapter's <code>grammar_hooks.pre_parse</code> changes the source text, the parser reads the changed text with Python's own <code>ast.parse</code>. Any hook makes the parser rebuild the whole source text first, which takes about 8% of the parse time, so define one only if it changes something. The Afan Oromo adapter defines none.</li>
+<li>Python 3.14 template strings (<code>t"..."</code>) are not supported.</li>
+</ul>
+<h2 id="graphemes">Graphemes</h2>
+<p><code>oromscript.graphemes</code> knows how Afan Oromo (Qubee) letters are written:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Digraphs (<code>digraph</code>)</td>
+<td><code>ch</code>, <code>dh</code>, <code>ny</code>, <code>ph</code>, <code>sh</code>, <code>ts</code>, <code>zy</code></td>
+</tr>
+<tr>
+<td>Long vowels (<code>long_vowel</code>)</td>
+<td><code>aa</code>, <code>ee</code>, <code>ii</code>, <code>oo</code>, <code>uu</code></td>
+</tr>
+<tr>
+<td>Doubled consonants (<code>geminate</code>)</td>
+<td><code>bb</code>, <code>kk</code></td>
+</tr>
+<tr>
+<td>Doubled digraphs (<code>geminate_digraph</code>)</td>
+<td><code>cch</code>, <code>ddh</code></td>
+</tr>
+<tr>
+<td>Hudhaa (<code>hudhaa</code>)</td>
+<td><code>'</code>, <code>’</code>, <code>ʼ</code>, <code>‘</code></td>
+</tr>
+</tbody>
+</table>
+<p>A unit is written in one case (<code>aa</code>, <code>AA</code>) or capitalised (<code>Aa</code>, <code>Ch</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">oromscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">split_graphemes</span><span class="p">,</span> <span class="n">grapheme_len</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">split_graphemes</span><span class="p">(</span><span class="s2">"dhaabbata"</span><span class="p">)</span>   <span class="c1"># ['dh', 'aa', 'bb', 'a', 't', 'a']</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">grapheme_len</span><span class="p">(</span><span class="s2">"dhaabbata"</span><span class="p">)</span>      <span class="c1"># 6</span>
+</code></pre></div>
+<h3 id="grapheme-nodes-in-the-syntax-tree">Grapheme nodes in the syntax tree</h3>
+<p><code>Grapheme</code> is an <code>ast.AST</code> node with the fields <code>text</code>, <code>kind</code>, <code>start</code> and <code>end</code> (offsets in the name). The parser attaches a tuple of them to every <code>Name</code>, <code>Attribute</code>, <code>arg</code>, <code>keyword</code>, <code>FunctionDef</code>, <code>AsyncFunctionDef</code>, <code>ClassDef</code>, <code>ExceptHandler</code> and <code>alias</code> as the attribute <code>graphemes</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">oromscript.graphemes</span><span class="w"> </span><span class="kn">import</span> <span class="n">iter_graphemes</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">graphemes</span> <span class="ow">in</span> <span class="n">iter_graphemes</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">graphemes</span> <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">is_multi_character</span><span class="p">])</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># arg ['dh', 'aa', 'bb']</span>
+</code></pre></div>
+<p><code>graphemes</code> is not one of the node's <code>_fields</code>, so <code>ast.walk</code>, <code>ast.dump</code>, <code>ast.unparse</code> and <code>compile</code> ignore it and the tree stays valid Python. Equal names share the same cached nodes, so do not change them. The nodes describe names as they stand in the tree, so a translated keyword shows its Python name (<code>print</code>, not <code>agarsiisi</code>).</p>
+<h2 id="testing">Testing</h2>
+<p>The lexer and parser are checked against Python itself:</p>
+<ul>
+<li>The parser's tree and node positions are compared with <code>ast.parse</code> on hundreds of snippets, and on a sample of the Python standard library.</li>
+<li>The lexer's tokens are compared with <code>tokenize</code> on plain Python source.</li>
+<li>Invalid programs must be rejected by both parsers.</li>
+<li>Memory tests (<code>tests/test_memory.py</code>) run the pipeline many times and fail if memory or object counts grow.</li>
+<li>Speed tests (<code>tests/test_performance.py</code>) check throughput and that time grows in line with file size.</li>
+</ul>
+<p>Run everything with <code>make test</code>. Run the full standard library comparison with <code>pytest -m slow</code>. Run the benchmark with <code>make bench</code>.</p>
+<h2 id="performance">Performance</h2>
+<p><code>python benchmarks/bench.py</code> prints the time for each stage. On a development laptop (Python 3.14), measured on two 1 MB files:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Tokens</th>
+<th>Lexer</th>
+<th>Parser</th>
+<th>Lexer + parser</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Print statements (35,000 lines)</td>
+<td>175,000</td>
+<td>0.27 to 0.33 s</td>
+<td>0.25 to 0.37 s</td>
+<td>250,000 to 330,000 tokens/sec</td>
+</tr>
+<tr>
+<td>Mixed code from <code>examples/</code></td>
+<td>215,000</td>
+<td>0.37 to 0.48 s</td>
+<td>0.30 to 0.45 s</td>
+<td>230,000 to 320,000 tokens/sec</td>
+</tr>
+</tbody>
+</table>
+<p>The first figure in each range is the best of several runs, and the second is the mean of three runs in <code>benchmarks/bench.py</code> on a busy desktop. The whole transpile of a 1 MB file, including semantic analysis and code generation, takes about 1.2 to 1.3 seconds. The numbers depend on the machine and vary by about 20% from run to run.</p>
 
 
 
@@ -691,7 +919,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

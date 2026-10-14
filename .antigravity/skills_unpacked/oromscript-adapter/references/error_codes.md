@@ -10,7 +10,7 @@ for use in `error_messages.json`.
 | Code  | Class           | Trigger                                      | Context Variables              |
 |-------|-----------------|----------------------------------------------|--------------------------------|
 | E0001 | OrmLexError     | Tokenisation failure (bad character/encoding)| `{token}`, `{line}`, `{col}`  |
-| E0010 | OrmSyntaxError  | ast.parse() fails (syntax error)             | `{line}`, `{col}`, `{text}`   |
+| E0010 | OrmSyntaxError  | syntax error, or code nested too deeply      | `{line}`, `{col}`, `{text}`   |
 | E0011 | OrmSyntaxError  | Indentation error                            | `{line}`, `{col}`             |
 | E0012 | OrmSyntaxError  | Mixed keyword languages detected             | `{line}`, `{local}`, `{py}`   |
 | E0020 | OrmNameError    | Undefined name in strict mode                | `{name}`, `{line}`, `{col}`   |

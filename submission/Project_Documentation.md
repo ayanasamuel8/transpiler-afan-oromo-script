@@ -214,7 +214,7 @@ This satisfies the strict requirement that the translator must parse structure r
 
 ### 1.9 Unicode support
 
-Unicode support is important because the source language is not English. The implementation reads files using UTF-8 and uses Python’s tokenizer, which supports Unicode text. This makes the project suitable for local-language programming and documentation.
+Unicode support is important because the source language is not English. The implementation reads files using UTF-8, and its own lexer accepts Unicode identifiers (including combining marks) and normalises them the way Python does. This makes the project suitable for local-language programming and documentation.
 
 ### 1.10 Extra implemented features
 
@@ -259,11 +259,11 @@ The translator is implemented in phases.
 
 #### Lexer
 
-The lexer reads the OromScript source and translates localized keywords such as `yoo`, `hojii`, and `agarsiisi` into Python token equivalents.
+The lexer is hand-written. It reads the OromScript source, tracks indentation, and translates localized keywords such as `yoo`, `hojii`, and `agarsiisi` into Python token equivalents. Tokens keep their original line and column, and keywords with a hudhaa (apostrophe) are supported.
 
 #### Parser
 
-The parser rebuilds the translated program and uses Python AST parsing to ensure the result follows real syntax rules.
+The parser is a hand-written recursive descent parser that builds a standard Python AST from the translated tokens. It is checked against Python’s own parser so the result follows real syntax rules.
 
 #### Semantic analysis
 

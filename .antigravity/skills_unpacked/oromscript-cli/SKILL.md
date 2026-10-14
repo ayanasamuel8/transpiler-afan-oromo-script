@@ -122,7 +122,7 @@ oromscript new-lang amharic
 Scaffold contents:
 - `keyword_map.json` — all 35 Python keywords + 20 builtins with empty-string values.
 - `error_messages.json` — all E00xx codes with empty-string values.
-- `grammar_hooks.py` — no-op stub with all supported hook signatures.
+- `grammar_hooks.py` — docstring-only module. Define `pre_parse` only if it changes the text, because any hook makes the engine rebuild the source text.
 - `tests/__init__.py`
 - `tests/test_keywords.py` — parametrized test stub.
 - `tests/corpus/` — empty directory.
